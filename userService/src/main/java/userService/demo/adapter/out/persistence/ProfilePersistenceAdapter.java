@@ -1,33 +1,27 @@
 package userService.demo.adapter.out.persistence;
 
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import userService.demo.adapter.out.persistence.entity.AppUserJpaEntity;
 import userService.demo.adapter.out.persistence.entity.UserProfileJpaEntity;
 import userService.demo.adapter.out.persistence.mapper.ProfilePersistenceMapper;
 import userService.demo.adapter.out.persistence.repository.UserProfileJpaRepository;
 import userService.demo.domain.model.UserProfile;
 import userService.demo.domain.port.out.ProfileRepositoryPort;
-import jakarta.persistence.EntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class ProfilePersistenceAdapter implements ProfileRepositoryPort {
 
     private final UserProfileJpaRepository repository;
     private final ProfilePersistenceMapper mapper;
     private final EntityManager entityManager;
-
-    public ProfilePersistenceAdapter(UserProfileJpaRepository repository,
-                                      ProfilePersistenceMapper mapper,
-                                      EntityManager entityManager) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public UserProfile save(UserProfile profile) {

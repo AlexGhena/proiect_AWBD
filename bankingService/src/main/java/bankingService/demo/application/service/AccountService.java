@@ -6,6 +6,7 @@ import bankingService.demo.domain.model.AccountStatus;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,10 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AccountService implements AccountUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
-
-    public AccountService(AccountRepositoryPort accountRepositoryPort) {
-        this.accountRepositoryPort = accountRepositoryPort;
-    }
 
     @Override
     public BankAccount createAccount(BankAccount account) {

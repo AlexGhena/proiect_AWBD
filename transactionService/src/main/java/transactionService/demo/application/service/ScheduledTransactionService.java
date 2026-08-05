@@ -1,30 +1,26 @@
 package transactionService.demo.application.service;
 
-import transactionService.demo.domain.exception.ResourceNotFoundException;
-import transactionService.demo.domain.model.ScheduledTransaction;
-import transactionService.demo.domain.model.ScheduleStatus;
-import transactionService.demo.domain.port.in.ScheduledTransactionUseCase;
-import transactionService.demo.domain.port.out.CategoryRepositoryPort;
-import transactionService.demo.domain.port.out.ScheduledTransactionRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import transactionService.demo.domain.exception.ResourceNotFoundException;
+import transactionService.demo.domain.model.ScheduleStatus;
+import transactionService.demo.domain.model.ScheduledTransaction;
+import transactionService.demo.domain.port.in.ScheduledTransactionUseCase;
+import transactionService.demo.domain.port.out.CategoryRepositoryPort;
+import transactionService.demo.domain.port.out.ScheduledTransactionRepositoryPort;
 
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ScheduledTransactionService implements ScheduledTransactionUseCase {
 
     private final ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort;
     private final CategoryRepositoryPort categoryRepositoryPort;
-
-    public ScheduledTransactionService(ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort,
-                                        CategoryRepositoryPort categoryRepositoryPort) {
-        this.scheduledTransactionRepositoryPort = scheduledTransactionRepositoryPort;
-        this.categoryRepositoryPort = categoryRepositoryPort;
-    }
 
     @Override
     public ScheduledTransaction createScheduledTransaction(ScheduledTransaction scheduledTransaction) {

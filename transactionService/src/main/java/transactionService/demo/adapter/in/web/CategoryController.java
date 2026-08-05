@@ -1,12 +1,7 @@
 package transactionService.demo.adapter.in.web;
 
-import transactionService.demo.adapter.in.web.dto.category.CategoryResponse;
-import transactionService.demo.adapter.in.web.dto.category.CreateCategoryRequest;
-import transactionService.demo.adapter.in.web.dto.category.UpdateCategoryRequest;
-import transactionService.demo.adapter.in.web.mapper.CategoryWebMapper;
-import transactionService.demo.domain.model.TransactionCategory;
-import transactionService.demo.domain.port.in.CategoryUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -20,20 +15,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import transactionService.demo.adapter.in.web.dto.category.CategoryResponse;
+import transactionService.demo.adapter.in.web.dto.category.CreateCategoryRequest;
+import transactionService.demo.adapter.in.web.dto.category.UpdateCategoryRequest;
+import transactionService.demo.adapter.in.web.mapper.CategoryWebMapper;
+import transactionService.demo.domain.model.TransactionCategory;
+import transactionService.demo.domain.port.in.CategoryUseCase;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryUseCase categoryUseCase;
     private final CategoryWebMapper mapper;
-
-    public CategoryController(CategoryUseCase categoryUseCase, CategoryWebMapper mapper) {
-        this.categoryUseCase = categoryUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CreateCategoryRequest request) {

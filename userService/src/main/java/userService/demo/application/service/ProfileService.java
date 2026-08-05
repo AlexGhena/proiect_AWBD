@@ -1,29 +1,26 @@
 package userService.demo.application.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.DuplicateResourceException;
 import userService.demo.domain.exception.ResourceNotFoundException;
 import userService.demo.domain.model.UserProfile;
 import userService.demo.domain.port.in.ProfileUseCase;
 import userService.demo.domain.port.out.ProfileRepositoryPort;
 import userService.demo.domain.port.out.UserRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProfileService implements ProfileUseCase {
 
     private final ProfileRepositoryPort profileRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
-
-    public ProfileService(ProfileRepositoryPort profileRepositoryPort, UserRepositoryPort userRepositoryPort) {
-        this.profileRepositoryPort = profileRepositoryPort;
-        this.userRepositoryPort = userRepositoryPort;
-    }
 
     @Override
     public UserProfile createProfile(UserProfile profile) {

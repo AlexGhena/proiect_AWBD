@@ -1,12 +1,7 @@
 package transactionService.demo.adapter.in.web;
 
-import transactionService.demo.adapter.in.web.dto.transaction.CreateTransactionRequest;
-import transactionService.demo.adapter.in.web.dto.transaction.TransactionResponse;
-import transactionService.demo.adapter.in.web.dto.transaction.UpdateTransactionRequest;
-import transactionService.demo.adapter.in.web.mapper.TransactionWebMapper;
-import transactionService.demo.domain.model.BankTransaction;
-import transactionService.demo.domain.port.in.BankTransactionUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -19,21 +14,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import transactionService.demo.adapter.in.web.dto.transaction.CreateTransactionRequest;
+import transactionService.demo.adapter.in.web.dto.transaction.TransactionResponse;
+import transactionService.demo.adapter.in.web.dto.transaction.UpdateTransactionRequest;
+import transactionService.demo.adapter.in.web.mapper.TransactionWebMapper;
+import transactionService.demo.domain.model.BankTransaction;
+import transactionService.demo.domain.port.in.BankTransactionUseCase;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final BankTransactionUseCase bankTransactionUseCase;
     private final TransactionWebMapper mapper;
-
-    public TransactionController(BankTransactionUseCase bankTransactionUseCase, TransactionWebMapper mapper) {
-        this.bankTransactionUseCase = bankTransactionUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping("/api/transactions")
     public ResponseEntity<TransactionResponse> create(@Valid @RequestBody CreateTransactionRequest request) {

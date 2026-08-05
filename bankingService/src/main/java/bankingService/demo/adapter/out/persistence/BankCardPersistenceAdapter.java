@@ -7,6 +7,7 @@ import bankingService.demo.adapter.out.persistence.repository.BankCardJpaReposit
 import bankingService.demo.domain.model.BankCard;
 import bankingService.demo.domain.port.out.CardRepositoryPort;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -17,19 +18,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class BankCardPersistenceAdapter implements CardRepositoryPort {
 
     private final BankCardJpaRepository repository;
     private final BankCardPersistenceMapper mapper;
     private final EntityManager entityManager;
-
-    public BankCardPersistenceAdapter(BankCardJpaRepository repository,
-                                       BankCardPersistenceMapper mapper,
-                                       EntityManager entityManager) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public BankCard save(BankCard card) {

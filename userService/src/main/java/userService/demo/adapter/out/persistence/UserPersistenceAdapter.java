@@ -1,27 +1,24 @@
 package userService.demo.adapter.out.persistence;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import userService.demo.adapter.out.persistence.entity.AppUserJpaEntity;
 import userService.demo.adapter.out.persistence.mapper.UserPersistenceMapper;
 import userService.demo.adapter.out.persistence.repository.AppUserJpaRepository;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.out.UserRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class UserPersistenceAdapter implements UserRepositoryPort {
 
     private final AppUserJpaRepository repository;
     private final UserPersistenceMapper mapper;
-
-    public UserPersistenceAdapter(AppUserJpaRepository repository, UserPersistenceMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
 
     @Override
     public AppUser save(AppUser user) {

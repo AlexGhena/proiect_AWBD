@@ -1,12 +1,7 @@
 package userService.demo.adapter.in.web;
 
-import userService.demo.adapter.in.web.dto.role.CreateRoleRequest;
-import userService.demo.adapter.in.web.dto.role.RoleResponse;
-import userService.demo.adapter.in.web.dto.role.UpdateRoleRequest;
-import userService.demo.adapter.in.web.mapper.RoleWebMapper;
-import userService.demo.domain.model.Role;
-import userService.demo.domain.port.in.RoleUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -20,20 +15,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import userService.demo.adapter.in.web.dto.role.CreateRoleRequest;
+import userService.demo.adapter.in.web.dto.role.RoleResponse;
+import userService.demo.adapter.in.web.dto.role.UpdateRoleRequest;
+import userService.demo.adapter.in.web.mapper.RoleWebMapper;
+import userService.demo.domain.model.Role;
+import userService.demo.domain.port.in.RoleUseCase;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/roles")
+@RequiredArgsConstructor
 public class RoleController {
 
     private final RoleUseCase roleUseCase;
     private final RoleWebMapper mapper;
-
-    public RoleController(RoleUseCase roleUseCase, RoleWebMapper mapper) {
-        this.roleUseCase = roleUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     public ResponseEntity<RoleResponse> create(@Valid @RequestBody CreateRoleRequest request) {

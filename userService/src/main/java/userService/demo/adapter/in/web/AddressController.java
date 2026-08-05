@@ -1,12 +1,7 @@
 package userService.demo.adapter.in.web;
 
-import userService.demo.adapter.in.web.dto.address.AddressResponse;
-import userService.demo.adapter.in.web.dto.address.CreateAddressRequest;
-import userService.demo.adapter.in.web.dto.address.UpdateAddressRequest;
-import userService.demo.adapter.in.web.mapper.AddressWebMapper;
-import userService.demo.domain.model.Address;
-import userService.demo.domain.port.in.AddressUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -19,21 +14,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import userService.demo.adapter.in.web.dto.address.AddressResponse;
+import userService.demo.adapter.in.web.dto.address.CreateAddressRequest;
+import userService.demo.adapter.in.web.dto.address.UpdateAddressRequest;
+import userService.demo.adapter.in.web.mapper.AddressWebMapper;
+import userService.demo.domain.model.Address;
+import userService.demo.domain.port.in.AddressUseCase;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class AddressController {
 
     private final AddressUseCase addressUseCase;
     private final AddressWebMapper mapper;
-
-    public AddressController(AddressUseCase addressUseCase, AddressWebMapper mapper) {
-        this.addressUseCase = addressUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping("/api/addresses")
     public ResponseEntity<AddressResponse> create(@Valid @RequestBody CreateAddressRequest request) {

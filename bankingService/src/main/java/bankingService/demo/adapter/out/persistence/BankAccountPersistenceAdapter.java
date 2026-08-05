@@ -5,6 +5,7 @@ import bankingService.demo.adapter.out.persistence.mapper.BankAccountPersistence
 import bankingService.demo.adapter.out.persistence.repository.BankAccountJpaRepository;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -13,15 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class BankAccountPersistenceAdapter implements AccountRepositoryPort {
 
     private final BankAccountJpaRepository repository;
     private final BankAccountPersistenceMapper mapper;
-
-    public BankAccountPersistenceAdapter(BankAccountJpaRepository repository, BankAccountPersistenceMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
 
     @Override
     public BankAccount save(BankAccount account) {
