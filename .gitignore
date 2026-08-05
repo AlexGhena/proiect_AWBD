@@ -1,0 +1,9 @@
+.idea/
+*.iml
+**/target/
+**/build/
+**/.gradle/
+.env
+*.env
+**/application-local.properties
+**/application-local.yml
