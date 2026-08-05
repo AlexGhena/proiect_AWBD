@@ -1,0 +1,79 @@
+package bankingService.demo.application.service;
+
+import bankingService.demo.domain.exception.DuplicateResourceException;
+import bankingService.demo.domain.exception.ResourceNotFoundException;
+import bankingService.demo.domain.model.AccountStatus;
+import bankingService.demo.domain.model.BankAccount;
+import bankingService.demo.domain.port.in.AccountUseCase;
+import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Service
+@Transactional
+public class AccountService implements AccountUseCase {
+
+    private final AccountRepositoryPort accountRepositoryPort;
+
+    public AccountService(AccountRepositoryPort accountRepositoryPort) {
+        this.accountRepositoryPort = accountRepositoryPort;
+    }
+
+    @Override
+    public BankAccount createAccount(BankAccount account) {
+        if (accountRepositoryPort.existsByIban(account.getIban())) {
+            throw new DuplicateResourceException(
+                    "Bank account with IBAN " + account.getIban() + " already exists");
+        }
+        account.setId(null);
+        account.setVersion(null);
+        if (account.getBalance() == null) {
+            account.setBalance(BigDecimal.ZERO);
+        }
+        if (account.getStatus() == null) {
+            account.setStatus(AccountStatus.ACTIVE);
+        }
+        return accountRepositoryPort.save(account);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BankAccount getAccount(UUID id) {
+        return accountRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account " + id + " not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BankAccount> listAccounts(Pageable pageable) {
+        return accountRepositoryPort.findAll(pageable);
+    }
+
+    @Override
+    public BankAccount updateAccount(UUID id, BankAccount updates) {
+        BankAccount existing = getAccount(id);
+        if (updates.getCurrency() != null) {
+            existing.setCurrency(updates.getCurrency());
+        }
+        if (updates.getBalance() != null) {
+            existing.setBalance(updates.getBalance());
+        }
+        if (updates.getStatus() != null) {
+            existing.setStatus(updates.getStatus());
+        }
+        return accountRepositoryPort.save(existing);
+    }
+
+    @Override
+    public void deleteAccount(UUID id) {
+        if (!accountRepositoryPort.existsById(id)) {
+            throw new ResourceNotFoundException("Bank account " + id + " not found");
+        }
+        accountRepositoryPort.deleteById(id);
+    }
+}

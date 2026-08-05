@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: bankingService
+  profiles:
+    active: dev
+
+server:
+  port: 8082

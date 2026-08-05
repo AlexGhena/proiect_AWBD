@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: transactionService
+  profiles:
+    active: dev
+
+server:
+  port: 8083
