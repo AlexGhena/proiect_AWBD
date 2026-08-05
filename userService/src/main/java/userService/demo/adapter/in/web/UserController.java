@@ -1,15 +1,7 @@
 package userService.demo.adapter.in.web;
 
-import userService.demo.adapter.in.web.dto.role.RoleResponse;
-import userService.demo.adapter.in.web.dto.user.CreateUserRequest;
-import userService.demo.adapter.in.web.dto.user.UpdateUserRequest;
-import userService.demo.adapter.in.web.dto.user.UserResponse;
-import userService.demo.adapter.in.web.mapper.RoleWebMapper;
-import userService.demo.adapter.in.web.mapper.UserWebMapper;
-import userService.demo.domain.model.AppUser;
-import userService.demo.domain.port.in.RoleUseCase;
-import userService.demo.domain.port.in.UserUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -23,6 +15,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import userService.demo.adapter.in.web.dto.role.RoleResponse;
+import userService.demo.adapter.in.web.dto.user.CreateUserRequest;
+import userService.demo.adapter.in.web.dto.user.UpdateUserRequest;
+import userService.demo.adapter.in.web.dto.user.UserResponse;
+import userService.demo.adapter.in.web.mapper.RoleWebMapper;
+import userService.demo.adapter.in.web.mapper.UserWebMapper;
+import userService.demo.domain.model.AppUser;
+import userService.demo.domain.port.in.RoleUseCase;
+import userService.demo.domain.port.in.UserUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,20 +31,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserUseCase userUseCase;
     private final RoleUseCase roleUseCase;
     private final UserWebMapper userMapper;
     private final RoleWebMapper roleMapper;
-
-    public UserController(UserUseCase userUseCase, RoleUseCase roleUseCase,
-                           UserWebMapper userMapper, RoleWebMapper roleMapper) {
-        this.userUseCase = userUseCase;
-        this.roleUseCase = roleUseCase;
-        this.userMapper = userMapper;
-        this.roleMapper = roleMapper;
-    }
 
     @PostMapping
     public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {

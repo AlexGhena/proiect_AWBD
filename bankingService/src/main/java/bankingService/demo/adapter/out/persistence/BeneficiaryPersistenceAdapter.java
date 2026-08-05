@@ -7,6 +7,7 @@ import bankingService.demo.adapter.out.persistence.repository.BeneficiaryJpaRepo
 import bankingService.demo.domain.model.Beneficiary;
 import bankingService.demo.domain.port.out.BeneficiaryRepositoryPort;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -17,19 +18,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class BeneficiaryPersistenceAdapter implements BeneficiaryRepositoryPort {
 
     private final BeneficiaryJpaRepository repository;
     private final BeneficiaryPersistenceMapper mapper;
     private final EntityManager entityManager;
-
-    public BeneficiaryPersistenceAdapter(BeneficiaryJpaRepository repository,
-                                          BeneficiaryPersistenceMapper mapper,
-                                          EntityManager entityManager) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Beneficiary save(Beneficiary beneficiary) {

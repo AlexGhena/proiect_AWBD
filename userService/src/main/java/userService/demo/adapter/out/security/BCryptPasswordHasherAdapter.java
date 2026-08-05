@@ -1,17 +1,15 @@
 package userService.demo.adapter.out.security;
 
-import userService.demo.domain.port.out.PasswordHasherPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import userService.demo.domain.port.out.PasswordHasherPort;
 
 @Component
+@RequiredArgsConstructor
 public class BCryptPasswordHasherAdapter implements PasswordHasherPort {
 
     private final PasswordEncoder passwordEncoder;
-
-    public BCryptPasswordHasherAdapter(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public String hash(String rawPassword) {

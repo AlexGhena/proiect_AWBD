@@ -1,30 +1,27 @@
 package userService.demo.application.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.ResourceNotFoundException;
 import userService.demo.domain.model.Address;
 import userService.demo.domain.model.AddressLabel;
 import userService.demo.domain.port.in.AddressUseCase;
 import userService.demo.domain.port.out.AddressRepositoryPort;
 import userService.demo.domain.port.out.ProfileRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AddressService implements AddressUseCase {
 
     private final AddressRepositoryPort addressRepositoryPort;
     private final ProfileRepositoryPort profileRepositoryPort;
-
-    public AddressService(AddressRepositoryPort addressRepositoryPort, ProfileRepositoryPort profileRepositoryPort) {
-        this.addressRepositoryPort = addressRepositoryPort;
-        this.profileRepositoryPort = profileRepositoryPort;
-    }
 
     @Override
     public Address createAddress(Address address) {

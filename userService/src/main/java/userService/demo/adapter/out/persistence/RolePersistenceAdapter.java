@@ -1,32 +1,26 @@
 package userService.demo.adapter.out.persistence;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import userService.demo.adapter.out.persistence.entity.RoleJpaEntity;
 import userService.demo.adapter.out.persistence.mapper.RolePersistenceMapper;
 import userService.demo.adapter.out.persistence.repository.RoleJpaRepository;
 import userService.demo.adapter.out.persistence.repository.UserRoleJpaRepository;
 import userService.demo.domain.model.Role;
 import userService.demo.domain.port.out.RoleRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class RolePersistenceAdapter implements RoleRepositoryPort {
 
     private final RoleJpaRepository repository;
     private final UserRoleJpaRepository userRoleJpaRepository;
     private final RolePersistenceMapper mapper;
-
-    public RolePersistenceAdapter(RoleJpaRepository repository,
-                                   UserRoleJpaRepository userRoleJpaRepository,
-                                   RolePersistenceMapper mapper) {
-        this.repository = repository;
-        this.userRoleJpaRepository = userRoleJpaRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public Role save(Role role) {

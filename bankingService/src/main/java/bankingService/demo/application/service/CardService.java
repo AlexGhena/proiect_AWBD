@@ -7,6 +7,7 @@ import bankingService.demo.domain.model.CardStatus;
 import bankingService.demo.domain.port.in.CardUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import bankingService.demo.domain.port.out.CardRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,11 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CardService implements CardUseCase {
 
     private final CardRepositoryPort cardRepositoryPort;
     private final AccountRepositoryPort accountRepositoryPort;
-
-    public CardService(CardRepositoryPort cardRepositoryPort, AccountRepositoryPort accountRepositoryPort) {
-        this.cardRepositoryPort = cardRepositoryPort;
-        this.accountRepositoryPort = accountRepositoryPort;
-    }
 
     @Override
     public BankCard createCard(BankCard card) {

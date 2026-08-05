@@ -1,12 +1,7 @@
 package transactionService.demo.adapter.in.web;
 
-import transactionService.demo.adapter.in.web.dto.scheduled.CreateScheduledTransactionRequest;
-import transactionService.demo.adapter.in.web.dto.scheduled.ScheduledTransactionResponse;
-import transactionService.demo.adapter.in.web.dto.scheduled.UpdateScheduledTransactionRequest;
-import transactionService.demo.adapter.in.web.mapper.ScheduledTransactionWebMapper;
-import transactionService.demo.domain.model.ScheduledTransaction;
-import transactionService.demo.domain.port.in.ScheduledTransactionUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -20,21 +15,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import transactionService.demo.adapter.in.web.dto.scheduled.CreateScheduledTransactionRequest;
+import transactionService.demo.adapter.in.web.dto.scheduled.ScheduledTransactionResponse;
+import transactionService.demo.adapter.in.web.dto.scheduled.UpdateScheduledTransactionRequest;
+import transactionService.demo.adapter.in.web.mapper.ScheduledTransactionWebMapper;
+import transactionService.demo.domain.model.ScheduledTransaction;
+import transactionService.demo.domain.port.in.ScheduledTransactionUseCase;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/scheduled-transactions")
+@RequiredArgsConstructor
 public class ScheduledTransactionController {
 
     private final ScheduledTransactionUseCase scheduledTransactionUseCase;
     private final ScheduledTransactionWebMapper mapper;
-
-    public ScheduledTransactionController(ScheduledTransactionUseCase scheduledTransactionUseCase,
-                                           ScheduledTransactionWebMapper mapper) {
-        this.scheduledTransactionUseCase = scheduledTransactionUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     public ResponseEntity<ScheduledTransactionResponse> create(

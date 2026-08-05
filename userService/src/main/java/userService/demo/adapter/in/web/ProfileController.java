@@ -1,12 +1,7 @@
 package userService.demo.adapter.in.web;
 
-import userService.demo.adapter.in.web.dto.profile.CreateProfileRequest;
-import userService.demo.adapter.in.web.dto.profile.ProfileResponse;
-import userService.demo.adapter.in.web.dto.profile.UpdateProfileRequest;
-import userService.demo.adapter.in.web.mapper.ProfileWebMapper;
-import userService.demo.domain.model.UserProfile;
-import userService.demo.domain.port.in.ProfileUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -19,19 +14,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import userService.demo.adapter.in.web.dto.profile.CreateProfileRequest;
+import userService.demo.adapter.in.web.dto.profile.ProfileResponse;
+import userService.demo.adapter.in.web.dto.profile.UpdateProfileRequest;
+import userService.demo.adapter.in.web.mapper.ProfileWebMapper;
+import userService.demo.domain.model.UserProfile;
+import userService.demo.domain.port.in.ProfileUseCase;
 
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 public class ProfileController {
 
     private final ProfileUseCase profileUseCase;
     private final ProfileWebMapper mapper;
-
-    public ProfileController(ProfileUseCase profileUseCase, ProfileWebMapper mapper) {
-        this.profileUseCase = profileUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping("/api/profiles")
     public ResponseEntity<ProfileResponse> create(@Valid @RequestBody CreateProfileRequest request) {

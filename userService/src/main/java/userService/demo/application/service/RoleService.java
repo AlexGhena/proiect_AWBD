@@ -1,5 +1,10 @@
 package userService.demo.application.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.DuplicateResourceException;
 import userService.demo.domain.exception.ResourceInUseException;
 import userService.demo.domain.exception.ResourceNotFoundException;
@@ -8,29 +13,18 @@ import userService.demo.domain.port.in.RoleUseCase;
 import userService.demo.domain.port.out.RoleRepositoryPort;
 import userService.demo.domain.port.out.UserRepositoryPort;
 import userService.demo.domain.port.out.UserRoleRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RoleService implements RoleUseCase {
 
     private final RoleRepositoryPort roleRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
     private final UserRoleRepositoryPort userRoleRepositoryPort;
-
-    public RoleService(RoleRepositoryPort roleRepositoryPort,
-                        UserRepositoryPort userRepositoryPort,
-                        UserRoleRepositoryPort userRoleRepositoryPort) {
-        this.roleRepositoryPort = roleRepositoryPort;
-        this.userRepositoryPort = userRepositoryPort;
-        this.userRoleRepositoryPort = userRoleRepositoryPort;
-    }
 
     @Override
     public Role createRole(Role role) {

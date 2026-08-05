@@ -6,6 +6,7 @@ import bankingService.demo.domain.model.Beneficiary;
 import bankingService.demo.domain.port.in.BeneficiaryUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import bankingService.demo.domain.port.out.BeneficiaryRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,11 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BeneficiaryService implements BeneficiaryUseCase {
 
     private final BeneficiaryRepositoryPort beneficiaryRepositoryPort;
     private final AccountRepositoryPort accountRepositoryPort;
-
-    public BeneficiaryService(BeneficiaryRepositoryPort beneficiaryRepositoryPort,
-                               AccountRepositoryPort accountRepositoryPort) {
-        this.beneficiaryRepositoryPort = beneficiaryRepositoryPort;
-        this.accountRepositoryPort = accountRepositoryPort;
-    }
 
     @Override
     public Beneficiary createBeneficiary(Beneficiary beneficiary) {

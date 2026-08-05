@@ -1,29 +1,26 @@
 package userService.demo.application.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.DuplicateResourceException;
 import userService.demo.domain.exception.ResourceNotFoundException;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.in.UserUseCase;
 import userService.demo.domain.port.out.PasswordHasherPort;
 import userService.demo.domain.port.out.UserRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService implements UserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordHasherPort passwordHasherPort;
-
-    public UserService(UserRepositoryPort userRepositoryPort, PasswordHasherPort passwordHasherPort) {
-        this.userRepositoryPort = userRepositoryPort;
-        this.passwordHasherPort = passwordHasherPort;
-    }
 
     @Override
     public AppUser createUser(AppUser user, String rawPassword) {

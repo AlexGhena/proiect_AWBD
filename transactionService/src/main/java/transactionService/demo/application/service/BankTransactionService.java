@@ -1,5 +1,10 @@
 package transactionService.demo.application.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import transactionService.demo.domain.exception.DuplicateResourceException;
 import transactionService.demo.domain.exception.ResourceNotFoundException;
 import transactionService.demo.domain.model.BankTransaction;
@@ -8,29 +13,18 @@ import transactionService.demo.domain.port.in.BankTransactionUseCase;
 import transactionService.demo.domain.port.out.BankTransactionRepositoryPort;
 import transactionService.demo.domain.port.out.CategoryRepositoryPort;
 import transactionService.demo.domain.port.out.ScheduledTransactionRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BankTransactionService implements BankTransactionUseCase {
 
     private final BankTransactionRepositoryPort bankTransactionRepositoryPort;
     private final CategoryRepositoryPort categoryRepositoryPort;
     private final ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort;
-
-    public BankTransactionService(BankTransactionRepositoryPort bankTransactionRepositoryPort,
-                                   CategoryRepositoryPort categoryRepositoryPort,
-                                   ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort) {
-        this.bankTransactionRepositoryPort = bankTransactionRepositoryPort;
-        this.categoryRepositoryPort = categoryRepositoryPort;
-        this.scheduledTransactionRepositoryPort = scheduledTransactionRepositoryPort;
-    }
 
     @Override
     public BankTransaction createTransaction(BankTransaction transaction) {

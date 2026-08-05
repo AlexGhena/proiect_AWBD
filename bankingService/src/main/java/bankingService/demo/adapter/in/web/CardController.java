@@ -7,6 +7,7 @@ import bankingService.demo.adapter.in.web.mapper.CardWebMapper;
 import bankingService.demo.domain.model.BankCard;
 import bankingService.demo.domain.port.in.CardUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -26,15 +27,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class CardController {
 
     private final CardUseCase cardUseCase;
     private final CardWebMapper mapper;
-
-    public CardController(CardUseCase cardUseCase, CardWebMapper mapper) {
-        this.cardUseCase = cardUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping("/api/cards")
     public ResponseEntity<CardResponse> create(@Valid @RequestBody CreateCardRequest request) {

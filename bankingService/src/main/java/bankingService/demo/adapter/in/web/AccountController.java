@@ -7,6 +7,7 @@ import bankingService.demo.adapter.in.web.mapper.AccountWebMapper;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -25,15 +26,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 public class AccountController {
 
     private final AccountUseCase accountUseCase;
     private final AccountWebMapper mapper;
-
-    public AccountController(AccountUseCase accountUseCase, AccountWebMapper mapper) {
-        this.accountUseCase = accountUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest request) {

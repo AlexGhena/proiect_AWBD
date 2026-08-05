@@ -1,15 +1,16 @@
 package userService.demo.adapter.out.persistence;
 
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import userService.demo.adapter.out.persistence.entity.AddressJpaEntity;
 import userService.demo.adapter.out.persistence.entity.UserProfileJpaEntity;
 import userService.demo.adapter.out.persistence.mapper.AddressPersistenceMapper;
 import userService.demo.adapter.out.persistence.repository.AddressJpaRepository;
 import userService.demo.domain.model.Address;
 import userService.demo.domain.port.out.AddressRepositoryPort;
-import jakarta.persistence.EntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,19 +18,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class AddressPersistenceAdapter implements AddressRepositoryPort {
 
     private final AddressJpaRepository repository;
     private final AddressPersistenceMapper mapper;
     private final EntityManager entityManager;
-
-    public AddressPersistenceAdapter(AddressJpaRepository repository,
-                                      AddressPersistenceMapper mapper,
-                                      EntityManager entityManager) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Address save(Address address) {

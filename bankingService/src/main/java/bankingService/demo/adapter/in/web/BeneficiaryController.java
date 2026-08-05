@@ -7,6 +7,7 @@ import bankingService.demo.adapter.in.web.mapper.BeneficiaryWebMapper;
 import bankingService.demo.domain.model.Beneficiary;
 import bankingService.demo.domain.port.in.BeneficiaryUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -25,15 +26,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class BeneficiaryController {
 
     private final BeneficiaryUseCase beneficiaryUseCase;
     private final BeneficiaryWebMapper mapper;
-
-    public BeneficiaryController(BeneficiaryUseCase beneficiaryUseCase, BeneficiaryWebMapper mapper) {
-        this.beneficiaryUseCase = beneficiaryUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping("/api/beneficiaries")
     public ResponseEntity<BeneficiaryResponse> create(@Valid @RequestBody CreateBeneficiaryRequest request) {

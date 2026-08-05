@@ -1,5 +1,9 @@
 package transactionService.demo.adapter.out.persistence;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import transactionService.demo.adapter.out.persistence.entity.TransactionCategoryJpaEntity;
 import transactionService.demo.adapter.out.persistence.mapper.CategoryPersistenceMapper;
 import transactionService.demo.adapter.out.persistence.repository.BankTransactionJpaRepository;
@@ -7,30 +11,18 @@ import transactionService.demo.adapter.out.persistence.repository.ScheduledTrans
 import transactionService.demo.adapter.out.persistence.repository.TransactionCategoryJpaRepository;
 import transactionService.demo.domain.model.TransactionCategory;
 import transactionService.demo.domain.port.out.CategoryRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class CategoryPersistenceAdapter implements CategoryRepositoryPort {
 
     private final TransactionCategoryJpaRepository repository;
     private final BankTransactionJpaRepository bankTransactionJpaRepository;
     private final ScheduledTransactionJpaRepository scheduledTransactionJpaRepository;
     private final CategoryPersistenceMapper mapper;
-
-    public CategoryPersistenceAdapter(TransactionCategoryJpaRepository repository,
-                                       BankTransactionJpaRepository bankTransactionJpaRepository,
-                                       ScheduledTransactionJpaRepository scheduledTransactionJpaRepository,
-                                       CategoryPersistenceMapper mapper) {
-        this.repository = repository;
-        this.bankTransactionJpaRepository = bankTransactionJpaRepository;
-        this.scheduledTransactionJpaRepository = scheduledTransactionJpaRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public TransactionCategory save(TransactionCategory category) {
