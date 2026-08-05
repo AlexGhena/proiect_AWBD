@@ -6,3 +6,24 @@ spring:
 
 server:
   port: 8081
+
+app:
+  security:
+    jwt:
+      issuer: ${JWT_ISSUER:userService}
+      audience: ${JWT_AUDIENCE:awbd-banking-api}
+      access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:15m}
+      # PEM key material comes from the environment or a Kubernetes Secret and is never committed.
+      # Left blank in development, where a local key pair is generated and cached under .keys/.
+      private-key: ${JWT_PRIVATE_KEY:}
+      public-key: ${JWT_PUBLIC_KEY:}
+    remember-me:
+      key: ${REMEMBER_ME_KEY:dev-only-remember-me-key}
+      validity: ${REMEMBER_ME_VALIDITY:7d}
+      cookie-name: remember-me
+      # Enabled in staging/production, where HTTPS terminates at the Ingress.
+      secure-cookie: ${REMEMBER_ME_SECURE_COOKIE:false}
+    jdbc:
+      schema: ${AUTH_SCHEMA:users}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}

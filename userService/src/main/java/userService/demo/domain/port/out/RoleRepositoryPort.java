@@ -13,6 +13,8 @@ public interface RoleRepositoryPort {
 
     Optional<Role> findById(UUID id);
 
+    Optional<Role> findByName(String name);
+
     boolean existsById(UUID id);
 
     boolean existsByName(String name);

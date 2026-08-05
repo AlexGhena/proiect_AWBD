@@ -9,6 +9,7 @@ import bankingService.demo.domain.port.out.BeneficiaryRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class BeneficiaryService implements BeneficiaryUseCase {
     private final AccountRepositoryPort accountRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#beneficiary.ownerAccountId)")
     public Beneficiary createBeneficiary(Beneficiary beneficiary) {
         if (!accountRepositoryPort.existsById(beneficiary.getOwnerAccountId())) {
             throw new ResourceNotFoundException("Bank account " + beneficiary.getOwnerAccountId() + " not found");
@@ -39,6 +41,7 @@ public class BeneficiaryService implements BeneficiaryUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsBeneficiary(#id)")
     public Beneficiary getBeneficiary(UUID id) {
         return beneficiaryRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Beneficiary " + id + " not found"));
@@ -46,12 +49,14 @@ public class BeneficiaryService implements BeneficiaryUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<Beneficiary> listBeneficiaries(Pageable pageable) {
         return beneficiaryRepositoryPort.findAll(pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#ownerAccountId)")
     public List<Beneficiary> listBeneficiariesByAccount(UUID ownerAccountId) {
         if (!accountRepositoryPort.existsById(ownerAccountId)) {
             throw new ResourceNotFoundException("Bank account " + ownerAccountId + " not found");
@@ -60,6 +65,7 @@ public class BeneficiaryService implements BeneficiaryUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsBeneficiary(#id)")
     public Beneficiary updateBeneficiary(UUID id, Beneficiary updates) {
         Beneficiary existing = getBeneficiary(id);
         if (updates.getBeneficiaryName() != null) {
@@ -72,6 +78,7 @@ public class BeneficiaryService implements BeneficiaryUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsBeneficiary(#id)")
     public void deleteBeneficiary(UUID id) {
         if (!beneficiaryRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Beneficiary " + id + " not found");
