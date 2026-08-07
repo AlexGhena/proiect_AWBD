@@ -3,6 +3,7 @@ package userService.demo.application.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.DuplicateResourceException;
@@ -20,6 +21,9 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+// Every method here is role administration, which the matrix reserves for ADMIN. The one
+// exception is listRolesForUser, which a user may call for their own account.
+@PreAuthorize("hasRole('ADMIN')")
 public class RoleService implements RoleUseCase {
 
     private final RoleRepositoryPort roleRepositoryPort;
@@ -98,6 +102,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(#userId)")
     public List<Role> listRolesForUser(UUID userId) {
         if (!userRepositoryPort.existsById(userId)) {
             throw new ResourceNotFoundException("User " + userId + " not found");

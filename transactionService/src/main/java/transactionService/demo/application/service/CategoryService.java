@@ -3,6 +3,7 @@ package transactionService.demo.application.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import transactionService.demo.domain.exception.DuplicateResourceException;
@@ -22,6 +23,7 @@ public class CategoryService implements CategoryUseCase {
     private final CategoryRepositoryPort categoryRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public TransactionCategory createCategory(TransactionCategory category) {
         if (categoryRepositoryPort.existsByName(category.getName())) {
             throw new DuplicateResourceException(
@@ -33,6 +35,7 @@ public class CategoryService implements CategoryUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public TransactionCategory getCategory(UUID id) {
         return categoryRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction category " + id + " not found"));
@@ -40,11 +43,13 @@ public class CategoryService implements CategoryUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public Page<TransactionCategory> listCategories(Pageable pageable) {
         return categoryRepositoryPort.findAll(pageable);
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public TransactionCategory updateCategory(UUID id, TransactionCategory updates) {
         TransactionCategory existing = getCategory(id);
         if (updates.getName() != null) {
@@ -57,6 +62,7 @@ public class CategoryService implements CategoryUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCategory(UUID id) {
         if (!categoryRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Transaction category " + id + " not found");

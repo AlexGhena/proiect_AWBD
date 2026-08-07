@@ -3,6 +3,7 @@ package userService.demo.application.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.DuplicateResourceException;
@@ -23,6 +24,7 @@ public class ProfileService implements ProfileUseCase {
     private final UserRepositoryPort userRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.canCreateProfileFor(#profile.userId)")
     public UserProfile createProfile(UserProfile profile) {
         if (!userRepositoryPort.existsById(profile.getUserId())) {
             throw new ResourceNotFoundException("User " + profile.getUserId() + " not found");
@@ -36,6 +38,7 @@ public class ProfileService implements ProfileUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsProfile(#id)")
     public UserProfile getProfile(UUID id) {
         return profileRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile " + id + " not found"));
@@ -43,6 +46,7 @@ public class ProfileService implements ProfileUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(#userId)")
     public UserProfile getProfileByUser(UUID userId) {
         return profileRepositoryPort.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile for user " + userId + " not found"));
@@ -50,11 +54,13 @@ public class ProfileService implements ProfileUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<UserProfile> listProfiles(Pageable pageable) {
         return profileRepositoryPort.findAll(pageable);
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsProfile(#id)")
     public UserProfile updateProfile(UUID id, UserProfile updates) {
         UserProfile existing = getProfile(id);
         if (updates.getFirstName() != null) {
@@ -70,6 +76,7 @@ public class ProfileService implements ProfileUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsProfile(#id)")
     public void deleteProfile(UUID id) {
         if (!profileRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Profile " + id + " not found");

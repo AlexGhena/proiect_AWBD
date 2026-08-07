@@ -1,0 +1,24 @@
+# Tests run against a dedicated schema so they never touch the development data.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/awbd?currentSchema=banking_test
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: banking_test
+  flyway:
+    enabled: true
+    schemas: banking_test
+    default-schema: banking_test
+
+app:
+  security:
+    issuer: userService
+    audience: awbd-banking-api
+    # Never contacted: the tests supply their own decoder backed by a throwaway key pair.
+    jwk-set-uri: http://localhost:8081/api/auth/jwks.json

@@ -10,6 +10,12 @@ public interface UserUseCase {
 
     AppUser createUser(AppUser user, String rawPassword);
 
+    /**
+     * Public self-registration. Always grants ROLE_USER and nothing else, regardless of what the
+     * caller sent; escalating to ROLE_ADMIN is an administrator-only action.
+     */
+    AppUser register(AppUser user, String rawPassword);
+
     AppUser getUser(UUID id);
 
     Page<AppUser> listUsers(Pageable pageable);

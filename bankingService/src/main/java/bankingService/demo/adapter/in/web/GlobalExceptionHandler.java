@@ -2,12 +2,15 @@ package bankingService.demo.adapter.in.web;
 
 import bankingService.demo.domain.exception.DuplicateResourceException;
 import bankingService.demo.domain.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -36,8 +40,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "The request could not be completed because it violates a data integrity constraint");
     }
 
+    /**
+     * Rethrown rather than handled so ExceptionTranslationFilter can decide between 401 and 403
+     * based on whether the caller is anonymous. Without this the catch-all below would turn every
+     * authorization failure into a 500.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public void handleAccessDenied(AccessDeniedException ex) throws AccessDeniedException {
+        throw ex;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public void handleAuthenticationFailure(AuthenticationException ex) throws AuthenticationException {
+        throw ex;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex) {
+        log.error("Unhandled exception while processing the request", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred");
     }

@@ -1,6 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/awbd
+    # currentSchema puts the project schema on the connection search path so Spring Security's
+    # remember-me repository, whose SQL is unqualified, resolves persistent_logins correctly.
+    url: jdbc:postgresql://localhost:5432/awbd?currentSchema=users
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:admin}
   jpa:

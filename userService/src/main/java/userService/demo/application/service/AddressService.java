@@ -3,6 +3,7 @@ package userService.demo.application.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import userService.demo.domain.exception.ResourceNotFoundException;
@@ -24,6 +25,7 @@ public class AddressService implements AddressUseCase {
     private final ProfileRepositoryPort profileRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsProfile(#address.profileId)")
     public Address createAddress(Address address) {
         if (!profileRepositoryPort.existsById(address.getProfileId())) {
             throw new ResourceNotFoundException("Profile " + address.getProfileId() + " not found");
@@ -40,6 +42,7 @@ public class AddressService implements AddressUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsAddress(#id)")
     public Address getAddress(UUID id) {
         return addressRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address " + id + " not found"));
@@ -47,12 +50,14 @@ public class AddressService implements AddressUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<Address> listAddresses(Pageable pageable) {
         return addressRepositoryPort.findAll(pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsProfile(#profileId)")
     public List<Address> listAddressesByProfile(UUID profileId) {
         if (!profileRepositoryPort.existsById(profileId)) {
             throw new ResourceNotFoundException("Profile " + profileId + " not found");
@@ -61,6 +66,7 @@ public class AddressService implements AddressUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsAddress(#id)")
     public Address updateAddress(UUID id, Address updates) {
         Address existing = getAddress(id);
         if (updates.getLabel() != null) {
@@ -85,6 +91,7 @@ public class AddressService implements AddressUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.ownsAddress(#id)")
     public void deleteAddress(UUID id) {
         if (!addressRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Address " + id + " not found");

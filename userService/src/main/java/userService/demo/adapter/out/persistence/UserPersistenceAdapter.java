@@ -33,6 +33,11 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<AppUser> findByUsername(String username) {
+        return repository.findByUsername(username).map(mapper::toDomain);
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         return repository.existsById(id);
     }

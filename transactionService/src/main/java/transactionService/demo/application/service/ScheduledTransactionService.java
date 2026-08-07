@@ -3,6 +3,7 @@ package transactionService.demo.application.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import transactionService.demo.domain.exception.ResourceNotFoundException;
@@ -23,6 +24,7 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
     private final CategoryRepositoryPort categoryRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.ownsEitherAccount(#scheduledTransaction.sourceAccountId, #scheduledTransaction.destinationAccountId)")
     public ScheduledTransaction createScheduledTransaction(ScheduledTransaction scheduledTransaction) {
         if (scheduledTransaction.getCategoryId() != null
                 && !categoryRepositoryPort.existsById(scheduledTransaction.getCategoryId())) {
@@ -38,6 +40,7 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.ownsScheduledTransaction(#id)")
     public ScheduledTransaction getScheduledTransaction(UUID id) {
         return scheduledTransactionRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Scheduled transaction " + id + " not found"));
@@ -45,11 +48,13 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<ScheduledTransaction> listScheduledTransactions(Pageable pageable) {
         return scheduledTransactionRepositoryPort.findAll(pageable);
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.ownsScheduledTransaction(#id)")
     public ScheduledTransaction updateScheduledTransaction(UUID id, ScheduledTransaction updates) {
         ScheduledTransaction existing = getScheduledTransaction(id);
         if (updates.getCategoryId() != null) {
@@ -80,6 +85,7 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.ownsScheduledTransaction(#id)")
     public void deleteScheduledTransaction(UUID id) {
         if (!scheduledTransactionRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Scheduled transaction " + id + " not found");

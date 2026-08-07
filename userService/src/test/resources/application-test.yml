@@ -1,0 +1,30 @@
+# Tests run against a dedicated schema so they never touch the development data.
+# Flyway creates and seeds it from the same migrations the real service uses.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/awbd?currentSchema=users_test
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: users_test
+  flyway:
+    enabled: true
+    schemas: users_test
+    default-schema: users_test
+    clean-disabled: false
+
+app:
+  security:
+    jdbc:
+      schema: users_test
+    jwt:
+      issuer: userService
+      audience: awbd-banking-api
+      access-token-ttl: 15m
+    remember-me:
+      key: test-only-remember-me-key

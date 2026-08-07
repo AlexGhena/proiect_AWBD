@@ -10,6 +10,7 @@ import bankingService.demo.domain.port.out.CardRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class CardService implements CardUseCase {
     private final AccountRepositoryPort accountRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#card.accountId)")
     public BankCard createCard(BankCard card) {
         if (!accountRepositoryPort.existsById(card.getAccountId())) {
             throw new ResourceNotFoundException("Bank account " + card.getAccountId() + " not found");
@@ -42,6 +44,7 @@ public class CardService implements CardUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsCard(#id)")
     public BankCard getCard(UUID id) {
         return cardRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank card " + id + " not found"));
@@ -49,12 +52,14 @@ public class CardService implements CardUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<BankCard> listCards(Pageable pageable) {
         return cardRepositoryPort.findAll(pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#accountId)")
     public List<BankCard> listCardsByAccount(UUID accountId) {
         if (!accountRepositoryPort.existsById(accountId)) {
             throw new ResourceNotFoundException("Bank account " + accountId + " not found");
@@ -63,6 +68,7 @@ public class CardService implements CardUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsCard(#id)")
     public BankCard updateCard(UUID id, BankCard updates) {
         BankCard existing = getCard(id);
         if (updates.getCardholderName() != null) {
@@ -81,6 +87,7 @@ public class CardService implements CardUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsCard(#id)")
     public void deleteCard(UUID id) {
         if (!cardRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Bank card " + id + " not found");

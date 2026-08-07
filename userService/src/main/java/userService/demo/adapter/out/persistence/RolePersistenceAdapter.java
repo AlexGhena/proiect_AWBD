@@ -35,6 +35,11 @@ public class RolePersistenceAdapter implements RoleRepositoryPort {
     }
 
     @Override
+    public Optional<Role> findByName(String name) {
+        return repository.findByName(name).map(mapper::toDomain);
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         return repository.existsById(id);
     }

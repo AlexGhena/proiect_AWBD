@@ -9,6 +9,7 @@ import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class AccountService implements AccountUseCase {
     private final AccountRepositoryPort accountRepositoryPort;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isSelf(#account.userId)")
     public BankAccount createAccount(BankAccount account) {
         if (accountRepositoryPort.existsByIban(account.getIban())) {
             throw new DuplicateResourceException(
@@ -41,6 +43,7 @@ public class AccountService implements AccountUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#id)")
     public BankAccount getAccount(UUID id) {
         return accountRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account " + id + " not found"));
@@ -48,11 +51,13 @@ public class AccountService implements AccountUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<BankAccount> listAccounts(Pageable pageable) {
         return accountRepositoryPort.findAll(pageable);
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#id)")
     public BankAccount updateAccount(UUID id, BankAccount updates) {
         BankAccount existing = getAccount(id);
         if (updates.getCurrency() != null) {
@@ -68,6 +73,7 @@ public class AccountService implements AccountUseCase {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#id)")
     public void deleteAccount(UUID id) {
         if (!accountRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("Bank account " + id + " not found");
