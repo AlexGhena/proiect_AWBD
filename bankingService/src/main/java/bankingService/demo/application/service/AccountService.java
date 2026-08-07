@@ -6,6 +6,7 @@ import bankingService.demo.domain.model.AccountStatus;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import bankingService.demo.security.UserServiceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +23,14 @@ import java.util.UUID;
 public class AccountService implements AccountUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
+    private final UserServiceClient userServiceClient;
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isSelf(#account.userId)")
     public BankAccount createAccount(BankAccount account) {
+        if (!userServiceClient.userExists(account.getUserId())) {
+            throw new ResourceNotFoundException("User " + account.getUserId() + " not found");
+        }
         if (accountRepositoryPort.existsByIban(account.getIban())) {
             throw new DuplicateResourceException(
                     "Bank account with IBAN " + account.getIban() + " already exists");
