@@ -9,6 +9,7 @@ public record UserResponse(
         String email,
         Boolean enabled,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        Instant deletedAt
 ) {
 }

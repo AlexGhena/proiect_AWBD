@@ -87,6 +87,13 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<AppUser> listDeletedUsers(Pageable pageable) {
+        return userRepositoryPort.findAllDeleted(pageable);
+    }
+
+    @Override
     @PreAuthorize("hasRole('ADMIN') or @userSecurity.isSelf(#id)")
     public AppUser updateUser(UUID id, AppUser updates, String rawPassword) {
         AppUser existing = userRepositoryPort.findById(id)
@@ -120,6 +127,6 @@ public class UserService implements UserUseCase {
         if (!userRepositoryPort.existsById(id)) {
             throw new ResourceNotFoundException("User " + id + " not found");
         }
-        userRepositoryPort.deleteById(id);
+        userRepositoryPort.softDelete(id);
     }
 }
