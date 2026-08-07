@@ -21,4 +21,5 @@ public class AppUser {
     private Boolean enabled;
     private Instant createdAt;
     private Instant updatedAt;
+    private Instant deletedAt;
 }

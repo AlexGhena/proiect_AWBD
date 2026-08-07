@@ -56,6 +56,13 @@ public class UserController {
         return ResponseEntity.ok(new PagedModel<>(page));
     }
 
+    /** Admin-only: users hidden from every other endpoint because they were soft-deleted. */
+    @GetMapping("/deleted")
+    public ResponseEntity<PagedModel<UserResponse>> listDeleted(Pageable pageable) {
+        Page<UserResponse> page = userUseCase.listDeletedUsers(pageable).map(userMapper::toResponse);
+        return ResponseEntity.ok(new PagedModel<>(page));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
         AppUser updated = userUseCase.updateUser(id, userMapper.toDomain(request), request.password());

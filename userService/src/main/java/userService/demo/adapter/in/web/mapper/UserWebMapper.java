@@ -31,7 +31,8 @@ public class UserWebMapper {
                 domain.getEmail(),
                 domain.getEnabled(),
                 domain.getCreatedAt(),
-                domain.getUpdatedAt()
+                domain.getUpdatedAt(),
+                domain.getDeletedAt()
         );
     }
 }

@@ -28,6 +28,6 @@ public final class JwtTokenValidators {
 
     private static OAuth2TokenValidator<Jwt> audienceValidator(String audience) {
         return new JwtClaimValidator<List<String>>(JwtClaimNames.AUD,
-                aud -> aud != null && aud.contains(audience));
+                aud -> aud.contains(audience));
     }
 }

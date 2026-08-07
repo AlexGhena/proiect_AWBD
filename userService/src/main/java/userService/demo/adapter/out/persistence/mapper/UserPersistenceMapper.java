@@ -19,6 +19,7 @@ public class UserPersistenceMapper {
                 .enabled(domain.getEnabled())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
+                .deletedAt(domain.getDeletedAt())
                 .build();
     }
 
@@ -34,6 +35,7 @@ public class UserPersistenceMapper {
                 .enabled(entity.getEnabled())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .deletedAt(entity.getDeletedAt())
                 .build();
     }
 }

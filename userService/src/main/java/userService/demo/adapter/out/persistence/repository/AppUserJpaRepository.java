@@ -1,6 +1,8 @@
 package userService.demo.adapter.out.persistence.repository;
 
 import userService.demo.adapter.out.persistence.entity.AppUserJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,7 +12,16 @@ public interface AppUserJpaRepository extends JpaRepository<AppUserJpaEntity, UU
 
     Optional<AppUserJpaEntity> findByUsername(String username);
 
+    // Deliberately unfiltered: the username/email unique constraints span every row, deleted or
+    // not, so a duplicate check that ignored soft-deleted users could pass here and then fail on
+    // the database constraint instead.
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
+
+    boolean existsByIdAndDeletedAtIsNull(UUID id);
+
+    Page<AppUserJpaEntity> findAllByDeletedAtIsNull(Pageable pageable);
+
+    Page<AppUserJpaEntity> findAllByDeletedAtIsNotNull(Pageable pageable);
 }

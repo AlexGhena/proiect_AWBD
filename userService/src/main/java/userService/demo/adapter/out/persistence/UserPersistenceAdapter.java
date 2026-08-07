@@ -10,6 +10,7 @@ import userService.demo.adapter.out.persistence.repository.AppUserJpaRepository;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.out.UserRepositoryPort;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,17 +30,21 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
 
     @Override
     public Optional<AppUser> findById(UUID id) {
-        return repository.findById(id).map(mapper::toDomain);
+        return repository.findById(id)
+                .filter(entity -> entity.getDeletedAt() == null)
+                .map(mapper::toDomain);
     }
 
     @Override
     public Optional<AppUser> findByUsername(String username) {
-        return repository.findByUsername(username).map(mapper::toDomain);
+        return repository.findByUsername(username)
+                .filter(entity -> entity.getDeletedAt() == null)
+                .map(mapper::toDomain);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return repository.existsById(id);
+        return repository.existsByIdAndDeletedAtIsNull(id);
     }
 
     @Override
@@ -54,11 +59,20 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
 
     @Override
     public Page<AppUser> findAll(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toDomain);
+        return repository.findAllByDeletedAtIsNull(pageable).map(mapper::toDomain);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        repository.deleteById(id);
+    public Page<AppUser> findAllDeleted(Pageable pageable) {
+        return repository.findAllByDeletedAtIsNotNull(pageable).map(mapper::toDomain);
+    }
+
+    @Override
+    public void softDelete(UUID id) {
+        repository.findById(id).ifPresent(entity -> {
+            entity.setDeletedAt(Instant.now());
+            entity.setEnabled(false);
+            repository.save(entity);
+        });
     }
 }

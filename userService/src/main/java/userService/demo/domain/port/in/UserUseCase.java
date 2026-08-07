@@ -20,6 +20,9 @@ public interface UserUseCase {
 
     Page<AppUser> listUsers(Pageable pageable);
 
+    /** Admin-only view of soft-deleted users, otherwise invisible through {@link #getUser} and {@link #listUsers}. */
+    Page<AppUser> listDeletedUsers(Pageable pageable);
+
     AppUser updateUser(UUID id, AppUser updates, String rawPassword);
 
     void deleteUser(UUID id);
