@@ -1,5 +1,7 @@
 package transactionService.demo.adapter.in.web;
 
+import transactionService.demo.domain.exception.BankingBusinessException;
+import transactionService.demo.domain.exception.BankingServiceUnavailableException;
 import transactionService.demo.domain.exception.DuplicateResourceException;
 import transactionService.demo.domain.exception.InvalidPaginationException;
 import transactionService.demo.domain.exception.ResourceInUseException;
@@ -42,6 +44,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleInvalidPagination(InvalidPaginationException ex) {
         log.warn("Rejected invalid pagination request: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /** bankingService's own considered rejection (insufficient funds, blocked account, ...), passed through as-is. */
+    @ExceptionHandler(BankingBusinessException.class)
+    public ProblemDetail handleBankingBusinessException(BankingBusinessException ex) {
+        log.warn("bankingService rejected the request: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(ex.getStatusCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(BankingServiceUnavailableException.class)
+    public ProblemDetail handleBankingServiceUnavailable(BankingServiceUnavailableException ex) {
+        log.error("bankingService unavailable: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

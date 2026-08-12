@@ -2,8 +2,10 @@ package transactionService.demo.adapter.in.web.mapper;
 
 import transactionService.demo.adapter.in.web.dto.transaction.CreateTransactionRequest;
 import transactionService.demo.adapter.in.web.dto.transaction.TransactionResponse;
+import transactionService.demo.adapter.in.web.dto.transaction.TransferRequest;
 import transactionService.demo.adapter.in.web.dto.transaction.UpdateTransactionRequest;
 import transactionService.demo.domain.model.BankTransaction;
+import transactionService.demo.domain.model.TransactionType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +20,18 @@ public class TransactionWebMapper {
                 .amount(request.amount())
                 .currency(request.currency())
                 .type(request.type())
+                .description(request.description())
+                .build();
+    }
+
+    public BankTransaction toDomain(TransferRequest request) {
+        return BankTransaction.builder()
+                .categoryId(request.categoryId())
+                .sourceAccountId(request.sourceAccountId())
+                .destinationAccountId(request.destinationAccountId())
+                .amount(request.amount())
+                .currency(request.currency())
+                .type(TransactionType.TRANSFER)
                 .description(request.description())
                 .build();
     }

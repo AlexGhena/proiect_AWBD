@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import transactionService.demo.adapter.in.web.dto.common.PageResponse;
 import transactionService.demo.adapter.in.web.dto.transaction.CreateTransactionRequest;
 import transactionService.demo.adapter.in.web.dto.transaction.TransactionResponse;
+import transactionService.demo.adapter.in.web.dto.transaction.TransferRequest;
 import transactionService.demo.adapter.in.web.dto.transaction.UpdateTransactionRequest;
 import transactionService.demo.adapter.in.web.mapper.TransactionWebMapper;
 import transactionService.demo.adapter.in.web.support.PaginationParamsResolver;
 import transactionService.demo.domain.model.BankTransaction;
 import transactionService.demo.domain.port.in.BankTransactionUseCase;
+import transactionService.demo.domain.port.in.TransferUseCase;
 
 import java.util.List;
 import java.util.Set;
@@ -36,6 +38,7 @@ public class TransactionController {
     private static final String DEFAULT_SORT_FIELD = "createdAt";
 
     private final BankTransactionUseCase bankTransactionUseCase;
+    private final TransferUseCase transferUseCase;
     private final TransactionWebMapper mapper;
     private final PaginationParamsResolver paginationParamsResolver;
 
@@ -43,6 +46,12 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> create(@Valid @RequestBody CreateTransactionRequest request) {
         BankTransaction created = bankTransactionUseCase.createTransaction(mapper.toDomain(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(created));
+    }
+
+    @PostMapping("/api/transactions/transfers")
+    public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest request) {
+        BankTransaction completed = transferUseCase.executeTransfer(mapper.toDomain(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(completed));
     }
 
     @GetMapping("/api/transactions/{id}")

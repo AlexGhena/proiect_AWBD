@@ -26,3 +26,25 @@ app:
 
   clients:
     banking-service-url: ${BANKING_SERVICE_URL:http://localhost:8082}
+
+resilience4j:
+  retry:
+    instances:
+      bankingService:
+        max-attempts: 3
+        wait-duration: 200ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        # A 4xx from bankingService is a business decision, not a transient failure - never retried.
+        ignore-exceptions:
+          - transactionService.demo.domain.exception.BankingBusinessException
+  circuitbreaker:
+    instances:
+      bankingService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        ignore-exceptions:
+          - transactionService.demo.domain.exception.BankingBusinessException
