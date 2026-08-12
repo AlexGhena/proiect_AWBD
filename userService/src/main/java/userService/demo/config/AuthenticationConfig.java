@@ -22,7 +22,7 @@ import javax.sql.DataSource;
  * Spring Security JDBC; day-to-day user CRUD stays on Spring Data JPA.
  */
 @Configuration
-@EnableConfigurationProperties({JdbcAuthenticationProperties.class, RememberMeProperties.class})
+@EnableConfigurationProperties({JdbcAuthenticationProperties.class, RememberMeProperties.class, LoginAttemptProperties.class})
 public class AuthenticationConfig {
 
     @Bean
