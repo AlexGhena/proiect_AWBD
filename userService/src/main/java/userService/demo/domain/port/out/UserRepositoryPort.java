@@ -1,5 +1,6 @@
 package userService.demo.domain.port.out;
 
+import userService.demo.domain.model.ApprovalStatus;
 import userService.demo.domain.model.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,9 @@ public interface UserRepositoryPort {
 
     /** Soft-deleted users only, for admin visibility into otherwise-hidden accounts. */
     Page<AppUser> findAllDeleted(Pageable pageable);
+
+    /** Active, non-deleted users awaiting an admin decision. */
+    Page<AppUser> findAllByApprovalStatus(ApprovalStatus approvalStatus, Pageable pageable);
 
     /** Stamps deleted_at and disables login; the row and its history are kept. */
     void softDelete(UUID id);

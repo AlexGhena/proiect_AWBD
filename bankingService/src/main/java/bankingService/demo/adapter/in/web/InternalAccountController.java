@@ -1,15 +1,21 @@
 package bankingService.demo.adapter.in.web;
 
+import bankingService.demo.adapter.in.web.dto.account.AccountResponse;
 import bankingService.demo.adapter.in.web.dto.internal.AccountOperationResponse;
 import bankingService.demo.adapter.in.web.dto.internal.AccountSnapshotResponse;
 import bankingService.demo.adapter.in.web.dto.internal.CompensateAccountRequest;
 import bankingService.demo.adapter.in.web.dto.internal.CreditAccountRequest;
 import bankingService.demo.adapter.in.web.dto.internal.DebitAccountRequest;
+import bankingService.demo.adapter.in.web.dto.internal.ProvisionAccountRequest;
+import bankingService.demo.adapter.in.web.mapper.AccountWebMapper;
 import bankingService.demo.domain.model.AccountOperationResult;
 import bankingService.demo.domain.model.AccountSnapshot;
+import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountTransferUseCase;
+import bankingService.demo.domain.port.in.AccountUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,9 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 /**
- * Balance operations for the transfer Saga. Reached only by other services over the internal
- * network - never routed publicly by Ingress - so authorization here is "any authenticated
- * caller", not resource ownership. See {@link AccountTransferUseCase}.
+ * Reached only by other services over the internal network - never routed publicly by Ingress - so
+ * authorization here is "any authenticated caller", not resource ownership. Covers the balance
+ * operations for the transfer Saga (see {@link AccountTransferUseCase}) plus account provisioning
+ * for userService's registration-approval flow (see {@link AccountUseCase#provisionAccount}).
  */
 @RestController
 @RequestMapping("/internal/accounts")
@@ -32,6 +39,14 @@ import java.util.UUID;
 public class InternalAccountController {
 
     private final AccountTransferUseCase accountTransferUseCase;
+    private final AccountUseCase accountUseCase;
+    private final AccountWebMapper accountWebMapper;
+
+    @PostMapping("/provision")
+    public ResponseEntity<AccountResponse> provision(@Valid @RequestBody ProvisionAccountRequest request) {
+        BankAccount created = accountUseCase.provisionAccount(request.userId(), request.currency());
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountWebMapper.toResponse(created));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountSnapshotResponse> getSnapshot(@PathVariable UUID id) {

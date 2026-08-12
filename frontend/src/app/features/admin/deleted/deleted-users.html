@@ -1,0 +1,60 @@
+<section class="panel">
+  <div class="panel-header">
+    <h2>Deleted users</h2>
+  </div>
+
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="state-message">Loading…</p>
+  } @else if (rows().length === 0) {
+    <p class="state-message">No deleted users.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sortByField('username')">
+              Username
+              @if (sortBy() === 'username') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th class="sortable" (click)="sortByField('email')">
+              Email
+              @if (sortBy() === 'email') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th class="sortable" (click)="sortByField('createdAt')">
+              Registered
+              @if (sortBy() === 'createdAt') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th>Deleted</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of rows(); track user.id) {
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.createdAt | date: 'medium' }}</td>
+              <td>{{ user.deletedAt | date: 'medium' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="changePage($event)"
+    />
+  }
+</section>

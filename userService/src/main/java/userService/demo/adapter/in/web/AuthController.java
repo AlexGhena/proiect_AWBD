@@ -68,14 +68,17 @@ public class AuthController {
                 "parameterName", token.getParameterName()));
     }
 
+    /**
+     * The created account is disabled and PENDING: it cannot log in until an administrator approves
+     * it via {@code POST /api/users/{id}/approve}.
+     */
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         AppUser created = userUseCase.register(AppUser.builder()
                 .username(request.username())
                 .email(request.email())
-                .enabled(true)
                 .build(), request.password());
-        log.info("Registered new user {}", created.getId());
+        log.info("Registered new user {} pending admin approval", created.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toResponse(created));
     }
 

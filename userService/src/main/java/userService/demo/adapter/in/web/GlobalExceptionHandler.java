@@ -1,8 +1,10 @@
 package userService.demo.adapter.in.web;
 
 import lombok.extern.slf4j.Slf4j;
+import userService.demo.domain.exception.BankingProvisioningException;
 import userService.demo.domain.exception.DuplicateResourceException;
 import userService.demo.domain.exception.InvalidPaginationException;
+import userService.demo.domain.exception.InvalidRegistrationStateException;
 import userService.demo.domain.exception.ResourceInUseException;
 import userService.demo.domain.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,10 +34,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({DuplicateResourceException.class, ResourceInUseException.class})
+    @ExceptionHandler({DuplicateResourceException.class, ResourceInUseException.class,
+            InvalidRegistrationStateException.class})
     public ProblemDetail handleConflict(RuntimeException ex) {
         log.warn("Rejected request due to a conflicting resource state: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    /** bankingService could not be reached or refused the request while approving a registration. */
+    @ExceptionHandler(BankingProvisioningException.class)
+    public ProblemDetail handleBankingProvisioningFailure(BankingProvisioningException ex) {
+        log.error("Bank account provisioning failed: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidPaginationException.class)

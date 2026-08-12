@@ -1,0 +1,101 @@
+<section class="panel">
+  <div class="panel-header">
+    <h2>Users</h2>
+  </div>
+
+  @if (successMessage()) {
+    <p class="success-banner">{{ successMessage() }}</p>
+  }
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="state-message">Loading…</p>
+  } @else if (rows().length === 0) {
+    <p class="state-message">No users found.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sortByField('username')">
+              Username
+              @if (sortBy() === 'username') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th class="sortable" (click)="sortByField('email')">
+              Email
+              @if (sortBy() === 'email') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th>Login</th>
+            <th>Approval</th>
+            <th class="sortable" (click)="sortByField('createdAt')">
+              Registered
+              @if (sortBy() === 'createdAt') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of rows(); track user.id) {
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="badge" [class.badge-enabled]="user.enabled" [class.badge-disabled]="!user.enabled">
+                  {{ user.enabled ? 'Enabled' : 'Disabled' }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge-approved]="user.approvalStatus === 'APPROVED'"
+                  [class.badge-pending]="user.approvalStatus === 'PENDING'"
+                  [class.badge-rejected]="user.approvalStatus === 'REJECTED'"
+                >
+                  {{ user.approvalStatus }}
+                </span>
+              </td>
+              <td>{{ user.createdAt | date: 'medium' }}</td>
+              <td>
+                @if (confirmingId() === user.id) {
+                  <div class="inline-confirm">
+                    <span>Deactivate {{ user.username }}?</span>
+                    <button
+                      type="button"
+                      class="action-deactivate"
+                      [disabled]="pendingActionId() === user.id"
+                      (click)="confirmDeactivate(user)"
+                    >
+                      Confirm
+                    </button>
+                    <button type="button" class="action-cancel" (click)="cancelConfirm()">Cancel</button>
+                  </div>
+                } @else {
+                  <div class="row-actions">
+                    <button type="button" class="action-deactivate" (click)="requestDeactivate(user.id)">
+                      Deactivate
+                    </button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="changePage($event)"
+    />
+  }
+</section>

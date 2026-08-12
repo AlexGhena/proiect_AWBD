@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import userService.demo.adapter.out.persistence.entity.AppUserJpaEntity;
 import userService.demo.adapter.out.persistence.mapper.UserPersistenceMapper;
 import userService.demo.adapter.out.persistence.repository.AppUserJpaRepository;
+import userService.demo.domain.model.ApprovalStatus;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.out.UserRepositoryPort;
 
@@ -65,6 +66,11 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     @Override
     public Page<AppUser> findAllDeleted(Pageable pageable) {
         return repository.findAllByDeletedAtIsNotNull(pageable).map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<AppUser> findAllByApprovalStatus(ApprovalStatus approvalStatus, Pageable pageable) {
+        return repository.findAllByApprovalStatusAndDeletedAtIsNull(approvalStatus, pageable).map(mapper::toDomain);
     }
 
     @Override

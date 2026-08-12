@@ -1,0 +1,169 @@
+// Shared look for the admin data tables (pending/users/deleted/roles) - kept as one partial
+// since all four panels are the same "data-dense table in a card" shape.
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f2942;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.7rem 1.25rem;
+  color: #55636f;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #eef1f4;
+  white-space: nowrap;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table th.sortable:hover {
+  color: #0f2942;
+}
+
+.sort-indicator {
+  margin-left: 0.25rem;
+  color: #0f2942;
+}
+
+.data-table td {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #f3f5f7;
+  color: #1c2733;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mono {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-approved,
+.badge-enabled {
+  background: #e3f5e9;
+  color: #1e7a43;
+}
+
+.badge-pending {
+  background: #fdf1de;
+  color: #9a6a11;
+}
+
+.badge-rejected,
+.badge-disabled {
+  background: #fbe6e6;
+  color: #b3261e;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.row-actions button {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.action-approve {
+  background: #0f2942;
+  color: #fff;
+}
+
+.action-reject,
+.action-deactivate {
+  background: #ffffff;
+  color: #b3261e;
+  border-color: #e3b8b5;
+}
+
+.action-cancel {
+  background: #ffffff;
+  color: #55636f;
+  border-color: #c6cfd8;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inline-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #33414d;
+}
+
+.state-message {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: #55636f;
+}
+
+.error-banner {
+  margin: 0 1.25rem 1rem;
+  padding: 0.6rem 0.85rem;
+  background: #fbe6e6;
+  color: #8a1f1a;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.success-banner {
+  margin: 0 1.25rem 1rem;
+  padding: 0.6rem 0.85rem;
+  background: #e3f5e9;
+  color: #1e7a43;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}

@@ -4,17 +4,18 @@
   background: #f4f6f8;
 }
 
-.dashboard {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+.dashboard {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  flex: 1;
 }
 
 h1 {
@@ -23,17 +24,46 @@ h1 {
   color: #0f2942;
 }
 
-button {
-  padding: 0.5rem 1rem;
-  background: #ffffff;
-  color: #0f2942;
-  border: 1px solid #c6cfd8;
-  border-radius: 6px;
+.page-subtitle {
+  margin: 0.35rem 0 2rem;
+  color: #55636f;
   font-size: 0.9rem;
-  cursor: pointer;
 }
 
-.placeholder {
-  margin-top: 2rem;
+.panel {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f2942;
+}
+
+.empty-state {
+  padding: 2rem 1.25rem;
+  text-align: center;
   color: #55636f;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+.empty-state-hint {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #8a97a3;
 }

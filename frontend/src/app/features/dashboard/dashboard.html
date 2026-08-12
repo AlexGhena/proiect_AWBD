@@ -1,5 +1,7 @@
-<main class="dashboard">
-  <header class="dashboard-header">
+<div class="app-shell">
+  <app-topbar active="dashboard" />
+
+  <main class="dashboard">
     <h1>
       @if (currentUser(); as user) {
         Welcome back, {{ user.username }}
@@ -7,7 +9,28 @@
         Welcome back
       }
     </h1>
-    <button type="button" (click)="logout()">Log out</button>
-  </header>
-  <p class="placeholder">Account summaries and recent transactions will appear here.</p>
-</main>
+    <p class="page-subtitle">Here's an overview of your accounts and recent activity.</p>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Accounts</h2>
+      </div>
+      <div class="empty-state">
+        <p>No accounts are linked to your profile yet.</p>
+        <p class="empty-state-hint">
+          Once your registration is approved, an account with a dedicated IBAN is opened for you
+          automatically.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Recent transactions</h2>
+      </div>
+      <div class="empty-state">
+        <p>No recent activity to show.</p>
+      </div>
+    </section>
+  </main>
+</div>

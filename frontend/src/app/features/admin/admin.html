@@ -1,0 +1,38 @@
+<div class="app-shell">
+  <app-topbar active="admin" />
+
+  <main class="admin">
+    <h1>Administration</h1>
+    <p class="page-subtitle">Review registrations and manage user accounts.</p>
+
+    <div class="tabs">
+      <button type="button" [class.active]="activeTab() === 'pending'" (click)="selectTab('pending')">
+        Pending approvals
+      </button>
+      <button type="button" [class.active]="activeTab() === 'users'" (click)="selectTab('users')">
+        Users
+      </button>
+      <button type="button" [class.active]="activeTab() === 'deleted'" (click)="selectTab('deleted')">
+        Deleted users
+      </button>
+      <button type="button" [class.active]="activeTab() === 'roles'" (click)="selectTab('roles')">
+        Roles
+      </button>
+    </div>
+
+    @switch (activeTab()) {
+      @case ('pending') {
+        <app-admin-pending />
+      }
+      @case ('users') {
+        <app-admin-users-list />
+      }
+      @case ('deleted') {
+        <app-admin-deleted-users />
+      }
+      @case ('roles') {
+        <app-admin-roles-list />
+      }
+    }
+  </main>
+</div>

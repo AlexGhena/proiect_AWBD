@@ -1,0 +1,23 @@
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">AWBD</span>
+    <span class="brand-name">Banking System</span>
+  </div>
+
+  <nav class="primary-nav">
+    <a routerLink="/dashboard" class="nav-link" [class.active]="active() === 'dashboard'">Dashboard</a>
+    <a class="nav-link">Accounts</a>
+    <a class="nav-link">Cards</a>
+    <a class="nav-link">Transfers</a>
+    @if (isAdmin) {
+      <a routerLink="/admin" class="nav-link" [class.active]="active() === 'admin'">Admin</a>
+    }
+  </nav>
+
+  <div class="account-menu">
+    @if (currentUser(); as user) {
+      <span class="greeting">{{ user.username }}</span>
+    }
+    <button type="button" class="logout-button" (click)="logout()">Log out</button>
+  </div>
+</header>

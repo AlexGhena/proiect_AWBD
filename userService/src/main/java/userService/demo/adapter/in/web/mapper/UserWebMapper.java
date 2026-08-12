@@ -30,6 +30,7 @@ public class UserWebMapper {
                 domain.getUsername(),
                 domain.getEmail(),
                 domain.getEnabled(),
+                domain.getApprovalStatus(),
                 domain.getCreatedAt(),
                 domain.getUpdatedAt(),
                 domain.getDeletedAt()

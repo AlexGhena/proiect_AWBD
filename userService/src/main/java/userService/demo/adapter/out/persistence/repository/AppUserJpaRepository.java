@@ -1,6 +1,7 @@
 package userService.demo.adapter.out.persistence.repository;
 
 import userService.demo.adapter.out.persistence.entity.AppUserJpaEntity;
+import userService.demo.domain.model.ApprovalStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,6 @@ public interface AppUserJpaRepository extends JpaRepository<AppUserJpaEntity, UU
     Page<AppUserJpaEntity> findAllByDeletedAtIsNull(Pageable pageable);
 
     Page<AppUserJpaEntity> findAllByDeletedAtIsNotNull(Pageable pageable);
+
+    Page<AppUserJpaEntity> findAllByApprovalStatusAndDeletedAtIsNull(ApprovalStatus approvalStatus, Pageable pageable);
 }

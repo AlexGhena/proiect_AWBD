@@ -1,0 +1,12 @@
+<div class="pagination">
+  <span class="summary">
+    Page {{ displayPage() }} of {{ displayTotalPages() }}
+    @if (totalElements() !== undefined) {
+      ({{ totalElements() }} total)
+    }
+  </span>
+  <div class="controls">
+    <button type="button" [disabled]="isFirst()" (click)="previous()">Previous</button>
+    <button type="button" [disabled]="isLast()" (click)="next()">Next</button>
+  </div>
+</div>
