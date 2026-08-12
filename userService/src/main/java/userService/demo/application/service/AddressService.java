@@ -1,6 +1,7 @@
 package userService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AddressService implements AddressUseCase {
 
     private final AddressRepositoryPort addressRepositoryPort;
@@ -37,7 +39,9 @@ public class AddressService implements AddressUseCase {
         if (address.getIsDefault() == null) {
             address.setIsDefault(false);
         }
-        return addressRepositoryPort.save(address);
+        Address saved = addressRepositoryPort.save(address);
+        log.info("Address created with id={}, profileId={}", saved.getId(), saved.getProfileId());
+        return saved;
     }
 
     @Override
@@ -52,6 +56,7 @@ public class AddressService implements AddressUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<Address> listAddresses(Pageable pageable) {
+        log.debug("Listing addresses with pageable={}", pageable);
         return addressRepositoryPort.findAll(pageable);
     }
 
@@ -87,7 +92,9 @@ public class AddressService implements AddressUseCase {
         if (updates.getIsDefault() != null) {
             existing.setIsDefault(updates.getIsDefault());
         }
-        return addressRepositoryPort.save(existing);
+        Address saved = addressRepositoryPort.save(existing);
+        log.info("Address updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -97,5 +104,6 @@ public class AddressService implements AddressUseCase {
             throw new ResourceNotFoundException("Address " + id + " not found");
         }
         addressRepositoryPort.deleteById(id);
+        log.info("Address deleted with id={}", id);
     }
 }

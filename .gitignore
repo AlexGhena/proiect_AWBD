@@ -12,3 +12,7 @@ agent/
 # Locally generated JWT signing keys - never commit key material
 **/.keys/
 *.pem
+
+# Application logs
+logs/
+*.log

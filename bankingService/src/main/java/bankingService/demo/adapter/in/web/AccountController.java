@@ -3,14 +3,15 @@ package bankingService.demo.adapter.in.web;
 import bankingService.demo.adapter.in.web.dto.account.AccountResponse;
 import bankingService.demo.adapter.in.web.dto.account.CreateAccountRequest;
 import bankingService.demo.adapter.in.web.dto.account.UpdateAccountRequest;
+import bankingService.demo.adapter.in.web.dto.common.PageResponse;
 import bankingService.demo.adapter.in.web.mapper.AccountWebMapper;
+import bankingService.demo.adapter.in.web.support.PaginationParamsResolver;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -29,8 +32,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountController {
 
+    private static final Set<String> SORT_FIELDS = Set.of("iban", "balance", "createdAt");
+    private static final String DEFAULT_SORT_FIELD = "createdAt";
+
     private final AccountUseCase accountUseCase;
     private final AccountWebMapper mapper;
+    private final PaginationParamsResolver paginationParamsResolver;
 
     @PostMapping
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest request) {
@@ -44,9 +51,13 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<AccountResponse>> list(Pageable pageable) {
-        Page<AccountResponse> page = accountUseCase.listAccounts(pageable).map(mapper::toResponse);
-        return ResponseEntity.ok(new PagedModel<>(page));
+    public ResponseEntity<PageResponse<AccountResponse>> list(@RequestParam(required = false) Integer page,
+                                                                @RequestParam(required = false) Integer size,
+                                                                @RequestParam(required = false) String sortBy,
+                                                                @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = paginationParamsResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<AccountResponse> result = accountUseCase.listAccounts(pageable).map(mapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
     }
 
     @PutMapping("/{id}")

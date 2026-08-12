@@ -1,6 +1,7 @@
 package userService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 // Every method here is role administration, which the matrix reserves for ADMIN. The one
 // exception is listRolesForUser, which a user may call for their own account.
 @PreAuthorize("hasRole('ADMIN')")
@@ -36,7 +38,9 @@ public class RoleService implements RoleUseCase {
             throw new DuplicateResourceException("Role " + role.getName() + " already exists");
         }
         role.setId(null);
-        return roleRepositoryPort.save(role);
+        Role saved = roleRepositoryPort.save(role);
+        log.info("Role created with id={}, name={}", saved.getId(), saved.getName());
+        return saved;
     }
 
     @Override
@@ -49,6 +53,7 @@ public class RoleService implements RoleUseCase {
     @Override
     @Transactional(readOnly = true)
     public Page<Role> listRoles(Pageable pageable) {
+        log.debug("Listing roles with pageable={}", pageable);
         return roleRepositoryPort.findAll(pageable);
     }
 
@@ -64,7 +69,9 @@ public class RoleService implements RoleUseCase {
         if (updates.getDescription() != null) {
             existing.setDescription(updates.getDescription());
         }
-        return roleRepositoryPort.save(existing);
+        Role saved = roleRepositoryPort.save(existing);
+        log.info("Role updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -76,6 +83,7 @@ public class RoleService implements RoleUseCase {
             throw new ResourceInUseException("Role " + id + " is still assigned to one or more users");
         }
         roleRepositoryPort.deleteById(id);
+        log.info("Role deleted with id={}", id);
     }
 
     @Override
@@ -90,6 +98,7 @@ public class RoleService implements RoleUseCase {
             throw new DuplicateResourceException("User " + userId + " already has role " + roleId);
         }
         userRoleRepositoryPort.assign(userId, roleId);
+        log.info("Role assigned: userId={}, roleId={}", userId, roleId);
     }
 
     @Override
@@ -98,6 +107,7 @@ public class RoleService implements RoleUseCase {
             throw new ResourceNotFoundException("User " + userId + " does not have role " + roleId);
         }
         userRoleRepositoryPort.unassign(userId, roleId);
+        log.info("Role unassigned: userId={}, roleId={}", userId, roleId);
     }
 
     @Override

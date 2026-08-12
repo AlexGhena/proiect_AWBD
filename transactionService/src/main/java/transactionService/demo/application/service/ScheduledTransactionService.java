@@ -1,6 +1,7 @@
 package transactionService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduledTransactionService implements ScheduledTransactionUseCase {
 
     private final ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort;
@@ -35,7 +37,9 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
         if (scheduledTransaction.getStatus() == null) {
             scheduledTransaction.setStatus(ScheduleStatus.ACTIVE);
         }
-        return scheduledTransactionRepositoryPort.save(scheduledTransaction);
+        ScheduledTransaction saved = scheduledTransactionRepositoryPort.save(scheduledTransaction);
+        log.info("Scheduled transaction created with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -50,6 +54,7 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<ScheduledTransaction> listScheduledTransactions(Pageable pageable) {
+        log.debug("Listing scheduled transactions with pageable={}", pageable);
         return scheduledTransactionRepositoryPort.findAll(pageable);
     }
 
@@ -81,7 +86,9 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
         if (updates.getDescription() != null) {
             existing.setDescription(updates.getDescription());
         }
-        return scheduledTransactionRepositoryPort.save(existing);
+        ScheduledTransaction saved = scheduledTransactionRepositoryPort.save(existing);
+        log.info("Scheduled transaction updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -91,5 +98,6 @@ public class ScheduledTransactionService implements ScheduledTransactionUseCase 
             throw new ResourceNotFoundException("Scheduled transaction " + id + " not found");
         }
         scheduledTransactionRepositoryPort.deleteById(id);
+        log.info("Scheduled transaction deleted with id={}", id);
     }
 }

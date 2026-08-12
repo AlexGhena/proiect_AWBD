@@ -1,3 +1,7 @@
+logging:
+  level:
+    userService.demo: DEBUG
+
 spring:
   datasource:
     # currentSchema puts the project schema on the connection search path so Spring Security's

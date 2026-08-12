@@ -7,7 +7,15 @@ spring:
 server:
   port: 8081
 
+logging:
+  level:
+    root: INFO
+    userService.demo: INFO
+
 app:
+  pagination:
+    default-size: 20
+    max-size: 100
   security:
     jwt:
       issuer: ${JWT_ISSUER:userService}

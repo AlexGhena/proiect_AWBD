@@ -7,7 +7,15 @@ spring:
 server:
   port: 8082
 
+logging:
+  level:
+    root: INFO
+    bankingService.demo: INFO
+
 app:
+  pagination:
+    default-size: 20
+    max-size: 100
   security:
     # Must match what userService puts in the iss/aud claims, or every token is rejected.
     issuer: ${JWT_ISSUER:userService}
@@ -15,3 +23,6 @@ app:
     # Public verification keys only; the private signing key never leaves userService.
     jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8081/api/auth/jwks.json}
     cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+  clients:
+    user-service-url: ${USER_SERVICE_URL:http://localhost:8081}

@@ -8,6 +8,7 @@ import bankingService.demo.domain.port.in.CardUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import bankingService.demo.domain.port.out.CardRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class CardService implements CardUseCase {
 
     private final CardRepositoryPort cardRepositoryPort;
@@ -39,7 +41,9 @@ public class CardService implements CardUseCase {
         if (card.getStatus() == null) {
             card.setStatus(CardStatus.ACTIVE);
         }
-        return cardRepositoryPort.save(card);
+        BankCard saved = cardRepositoryPort.save(card);
+        log.info("Bank card created with id={}, accountId={}", saved.getId(), saved.getAccountId());
+        return saved;
     }
 
     @Override
@@ -54,6 +58,7 @@ public class CardService implements CardUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<BankCard> listCards(Pageable pageable) {
+        log.debug("Listing bank cards with pageable={}", pageable);
         return cardRepositoryPort.findAll(pageable);
     }
 
@@ -83,7 +88,9 @@ public class CardService implements CardUseCase {
         if (updates.getStatus() != null) {
             existing.setStatus(updates.getStatus());
         }
-        return cardRepositoryPort.save(existing);
+        BankCard saved = cardRepositoryPort.save(existing);
+        log.info("Bank card updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -93,5 +100,6 @@ public class CardService implements CardUseCase {
             throw new ResourceNotFoundException("Bank card " + id + " not found");
         }
         cardRepositoryPort.deleteById(id);
+        log.info("Bank card deleted with id={}", id);
     }
 }
