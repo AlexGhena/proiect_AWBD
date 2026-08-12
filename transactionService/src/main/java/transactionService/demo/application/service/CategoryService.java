@@ -1,6 +1,7 @@
 package transactionService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryService implements CategoryUseCase {
 
     private final CategoryRepositoryPort categoryRepositoryPort;
@@ -30,7 +32,9 @@ public class CategoryService implements CategoryUseCase {
                     "Transaction category with name " + category.getName() + " already exists");
         }
         category.setId(null);
-        return categoryRepositoryPort.save(category);
+        TransactionCategory saved = categoryRepositoryPort.save(category);
+        log.info("Transaction category created with id={}, name={}", saved.getId(), saved.getName());
+        return saved;
     }
 
     @Override
@@ -45,6 +49,7 @@ public class CategoryService implements CategoryUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
     public Page<TransactionCategory> listCategories(Pageable pageable) {
+        log.debug("Listing transaction categories with pageable={}", pageable);
         return categoryRepositoryPort.findAll(pageable);
     }
 
@@ -58,7 +63,9 @@ public class CategoryService implements CategoryUseCase {
         if (updates.getDescription() != null) {
             existing.setDescription(updates.getDescription());
         }
-        return categoryRepositoryPort.save(existing);
+        TransactionCategory saved = categoryRepositoryPort.save(existing);
+        log.info("Transaction category updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -72,5 +79,6 @@ public class CategoryService implements CategoryUseCase {
                     "Transaction category " + id + " is referenced by existing transactions or schedules");
         }
         categoryRepositoryPort.deleteById(id);
+        log.info("Transaction category deleted with id={}", id);
     }
 }

@@ -1,6 +1,7 @@
 package userService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileService implements ProfileUseCase {
 
     private final ProfileRepositoryPort profileRepositoryPort;
@@ -33,7 +35,9 @@ public class ProfileService implements ProfileUseCase {
             throw new DuplicateResourceException("User " + profile.getUserId() + " already has a profile");
         }
         profile.setId(null);
-        return profileRepositoryPort.save(profile);
+        UserProfile saved = profileRepositoryPort.save(profile);
+        log.info("Profile created with id={}, userId={}", saved.getId(), saved.getUserId());
+        return saved;
     }
 
     @Override
@@ -56,6 +60,7 @@ public class ProfileService implements ProfileUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<UserProfile> listProfiles(Pageable pageable) {
+        log.debug("Listing profiles with pageable={}", pageable);
         return profileRepositoryPort.findAll(pageable);
     }
 
@@ -72,7 +77,9 @@ public class ProfileService implements ProfileUseCase {
         if (updates.getPhone() != null) {
             existing.setPhone(updates.getPhone());
         }
-        return profileRepositoryPort.save(existing);
+        UserProfile saved = profileRepositoryPort.save(existing);
+        log.info("Profile updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -82,5 +89,6 @@ public class ProfileService implements ProfileUseCase {
             throw new ResourceNotFoundException("Profile " + id + " not found");
         }
         profileRepositoryPort.deleteById(id);
+        log.info("Profile deleted with id={}", id);
     }
 }

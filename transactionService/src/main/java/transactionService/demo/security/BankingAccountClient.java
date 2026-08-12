@@ -31,6 +31,7 @@ public class BankingAccountClient {
             return false;
         }
         try {
+            log.debug("Verifying account {} access via bankingService", accountId);
             restClient.get()
                     .uri("/api/accounts/{id}", accountId)
                     .retrieve()

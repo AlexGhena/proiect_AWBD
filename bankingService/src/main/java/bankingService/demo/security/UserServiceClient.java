@@ -32,6 +32,7 @@ public class UserServiceClient {
             return false;
         }
         try {
+            log.debug("Verifying user {} exists via userService", userId);
             restClient.get()
                     .uri("/api/users/{id}", userId)
                     .retrieve()

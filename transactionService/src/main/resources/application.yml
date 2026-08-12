@@ -7,7 +7,15 @@ spring:
 server:
   port: 8083
 
+logging:
+  level:
+    root: INFO
+    transactionService.demo: INFO
+
 app:
+  pagination:
+    default-size: 20
+    max-size: 100
   security:
     # Must match what userService puts in the iss/aud claims, or every token is rejected.
     issuer: ${JWT_ISSUER:userService}

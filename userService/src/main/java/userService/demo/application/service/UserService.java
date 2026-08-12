@@ -1,6 +1,7 @@
 package userService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserUseCase {
 
     private static final String DEFAULT_ROLE = "ROLE_USER";
@@ -42,6 +44,7 @@ public class UserService implements UserUseCase {
         Role defaultRole = roleRepositoryPort.findByName(DEFAULT_ROLE)
                 .orElseThrow(() -> new IllegalStateException(DEFAULT_ROLE + " is missing from the roles table"));
         userRoleRepositoryPort.assign(created.getId(), defaultRole.getId());
+        log.info("User registered with id={}, assigned role={}", created.getId(), DEFAULT_ROLE);
         return created;
     }
 
@@ -68,7 +71,9 @@ public class UserService implements UserUseCase {
         if (user.getEnabled() == null) {
             user.setEnabled(true);
         }
-        return userRepositoryPort.save(user);
+        AppUser saved = userRepositoryPort.save(user);
+        log.info("User created with id={}, username={}", saved.getId(), saved.getUsername());
+        return saved;
     }
 
     @Override
@@ -83,6 +88,7 @@ public class UserService implements UserUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<AppUser> listUsers(Pageable pageable) {
+        log.debug("Listing users with pageable={}", pageable);
         return userRepositoryPort.findAll(pageable);
     }
 
@@ -90,6 +96,7 @@ public class UserService implements UserUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<AppUser> listDeletedUsers(Pageable pageable) {
+        log.debug("Listing soft-deleted users with pageable={}", pageable);
         return userRepositoryPort.findAllDeleted(pageable);
     }
 
@@ -112,7 +119,9 @@ public class UserService implements UserUseCase {
         if (rawPassword != null && !rawPassword.isBlank()) {
             existing.setPasswordHash(passwordHasherPort.hash(rawPassword));
         }
-        return userRepositoryPort.save(existing);
+        AppUser saved = userRepositoryPort.save(existing);
+        log.info("User updated with id={}", saved.getId());
+        return saved;
     }
 
     private boolean isCurrentUserAdmin() {
@@ -128,5 +137,6 @@ public class UserService implements UserUseCase {
             throw new ResourceNotFoundException("User " + id + " not found");
         }
         userRepositoryPort.softDelete(id);
+        log.info("User soft-deleted with id={}", id);
     }
 }

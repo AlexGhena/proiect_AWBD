@@ -7,6 +7,7 @@ import bankingService.demo.domain.port.in.BeneficiaryUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import bankingService.demo.domain.port.out.BeneficiaryRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class BeneficiaryService implements BeneficiaryUseCase {
 
     private final BeneficiaryRepositoryPort beneficiaryRepositoryPort;
@@ -36,7 +38,9 @@ public class BeneficiaryService implements BeneficiaryUseCase {
                     "Beneficiary with IBAN " + beneficiary.getBeneficiaryIban() + " already saved for this account");
         }
         beneficiary.setId(null);
-        return beneficiaryRepositoryPort.save(beneficiary);
+        Beneficiary saved = beneficiaryRepositoryPort.save(beneficiary);
+        log.info("Beneficiary created with id={}, ownerAccountId={}", saved.getId(), saved.getOwnerAccountId());
+        return saved;
     }
 
     @Override
@@ -51,6 +55,7 @@ public class BeneficiaryService implements BeneficiaryUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<Beneficiary> listBeneficiaries(Pageable pageable) {
+        log.debug("Listing beneficiaries with pageable={}", pageable);
         return beneficiaryRepositoryPort.findAll(pageable);
     }
 
@@ -74,7 +79,9 @@ public class BeneficiaryService implements BeneficiaryUseCase {
         if (updates.getNickname() != null) {
             existing.setNickname(updates.getNickname());
         }
-        return beneficiaryRepositoryPort.save(existing);
+        Beneficiary saved = beneficiaryRepositoryPort.save(existing);
+        log.info("Beneficiary updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -84,5 +91,6 @@ public class BeneficiaryService implements BeneficiaryUseCase {
             throw new ResourceNotFoundException("Beneficiary " + id + " not found");
         }
         beneficiaryRepositoryPort.deleteById(id);
+        log.info("Beneficiary deleted with id={}", id);
     }
 }

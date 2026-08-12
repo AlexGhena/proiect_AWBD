@@ -2,6 +2,7 @@ package userService.demo.adapter.in.web;
 
 import lombok.extern.slf4j.Slf4j;
 import userService.demo.domain.exception.DuplicateResourceException;
+import userService.demo.domain.exception.InvalidPaginationException;
 import userService.demo.domain.exception.ResourceInUseException;
 import userService.demo.domain.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,12 +28,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler({DuplicateResourceException.class, ResourceInUseException.class})
     public ProblemDetail handleConflict(RuntimeException ex) {
+        log.warn("Rejected request due to a conflicting resource state: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ProblemDetail handleInvalidPagination(InvalidPaginationException ex) {
+        log.warn("Rejected invalid pagination request: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -47,6 +56,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthenticationFailure(AuthenticationException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
                 "Invalid username or password");
         problem.setTitle("Unauthorized");
@@ -60,6 +70,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public void handleAccessDenied(AccessDeniedException ex) throws AccessDeniedException {
+        log.warn("Access denied: {}", ex.getMessage());
         throw ex;
     }
 

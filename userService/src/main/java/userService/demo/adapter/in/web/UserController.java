@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,18 +13,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import userService.demo.adapter.in.web.dto.common.PageResponse;
 import userService.demo.adapter.in.web.dto.role.RoleResponse;
 import userService.demo.adapter.in.web.dto.user.CreateUserRequest;
 import userService.demo.adapter.in.web.dto.user.UpdateUserRequest;
 import userService.demo.adapter.in.web.dto.user.UserResponse;
 import userService.demo.adapter.in.web.mapper.RoleWebMapper;
 import userService.demo.adapter.in.web.mapper.UserWebMapper;
+import userService.demo.adapter.in.web.support.PaginationParamsResolver;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.in.RoleUseCase;
 import userService.demo.domain.port.in.UserUseCase;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,10 +37,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
+    private static final Set<String> SORT_FIELDS = Set.of("username", "email", "createdAt");
+    private static final String DEFAULT_SORT_FIELD = "createdAt";
+
     private final UserUseCase userUseCase;
     private final RoleUseCase roleUseCase;
     private final UserWebMapper userMapper;
     private final RoleWebMapper roleMapper;
+    private final PaginationParamsResolver pageableResolver;
 
     @PostMapping
     public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
@@ -51,16 +58,24 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<UserResponse>> list(Pageable pageable) {
-        Page<UserResponse> page = userUseCase.listUsers(pageable).map(userMapper::toResponse);
-        return ResponseEntity.ok(new PagedModel<>(page));
+    public ResponseEntity<PageResponse<UserResponse>> list(@RequestParam(required = false) Integer page,
+                                                             @RequestParam(required = false) Integer size,
+                                                             @RequestParam(required = false) String sortBy,
+                                                             @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = pageableResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<UserResponse> result = userUseCase.listUsers(pageable).map(userMapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
     }
 
     /** Admin-only: users hidden from every other endpoint because they were soft-deleted. */
     @GetMapping("/deleted")
-    public ResponseEntity<PagedModel<UserResponse>> listDeleted(Pageable pageable) {
-        Page<UserResponse> page = userUseCase.listDeletedUsers(pageable).map(userMapper::toResponse);
-        return ResponseEntity.ok(new PagedModel<>(page));
+    public ResponseEntity<PageResponse<UserResponse>> listDeleted(@RequestParam(required = false) Integer page,
+                                                                    @RequestParam(required = false) Integer size,
+                                                                    @RequestParam(required = false) String sortBy,
+                                                                    @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = pageableResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<UserResponse> result = userUseCase.listDeletedUsers(pageable).map(userMapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
     }
 
     @PutMapping("/{id}")

@@ -8,6 +8,7 @@ import bankingService.demo.domain.port.in.AccountUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
 import bankingService.demo.security.UserServiceClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AccountService implements AccountUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
@@ -43,7 +45,9 @@ public class AccountService implements AccountUseCase {
         if (account.getStatus() == null) {
             account.setStatus(AccountStatus.ACTIVE);
         }
-        return accountRepositoryPort.save(account);
+        BankAccount saved = accountRepositoryPort.save(account);
+        log.info("Bank account created with id={}, userId={}", saved.getId(), saved.getUserId());
+        return saved;
     }
 
     @Override
@@ -58,6 +62,7 @@ public class AccountService implements AccountUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<BankAccount> listAccounts(Pageable pageable) {
+        log.debug("Listing bank accounts with pageable={}", pageable);
         return accountRepositoryPort.findAll(pageable);
     }
 
@@ -74,7 +79,9 @@ public class AccountService implements AccountUseCase {
         if (updates.getStatus() != null) {
             existing.setStatus(updates.getStatus());
         }
-        return accountRepositoryPort.save(existing);
+        BankAccount saved = accountRepositoryPort.save(existing);
+        log.info("Bank account updated with id={}", saved.getId());
+        return saved;
     }
 
     @Override
@@ -84,5 +91,6 @@ public class AccountService implements AccountUseCase {
             throw new ResourceNotFoundException("Bank account " + id + " not found");
         }
         accountRepositoryPort.deleteById(id);
+        log.info("Bank account deleted with id={}", id);
     }
 }

@@ -1,6 +1,7 @@
 package transactionService.demo.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class BankTransactionService implements BankTransactionUseCase {
 
     private final BankTransactionRepositoryPort bankTransactionRepositoryPort;
@@ -48,7 +50,9 @@ public class BankTransactionService implements BankTransactionUseCase {
         if (transaction.getStatus() == null) {
             transaction.setStatus(TransactionStatus.PENDING);
         }
-        return bankTransactionRepositoryPort.save(transaction);
+        BankTransaction saved = bankTransactionRepositoryPort.save(transaction);
+        log.info("Bank transaction created with id={}, sagaId={}", saved.getId(), saved.getSagaId());
+        return saved;
     }
 
     @Override
@@ -63,6 +67,7 @@ public class BankTransactionService implements BankTransactionUseCase {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<BankTransaction> listTransactions(Pageable pageable) {
+        log.debug("Listing bank transactions with pageable={}", pageable);
         return bankTransactionRepositoryPort.findAll(pageable);
     }
 
@@ -89,7 +94,9 @@ public class BankTransactionService implements BankTransactionUseCase {
         if (updates.getFailureReason() != null) {
             existing.setFailureReason(updates.getFailureReason());
         }
-        return bankTransactionRepositoryPort.save(existing);
+        BankTransaction saved = bankTransactionRepositoryPort.save(existing);
+        log.info("Bank transaction updated with id={}, status={}", saved.getId(), saved.getStatus());
+        return saved;
     }
 
     @Override
@@ -99,5 +106,6 @@ public class BankTransactionService implements BankTransactionUseCase {
             throw new ResourceNotFoundException("Bank transaction " + id + " not found");
         }
         bankTransactionRepositoryPort.deleteById(id);
+        log.info("Bank transaction deleted with id={}", id);
     }
 }

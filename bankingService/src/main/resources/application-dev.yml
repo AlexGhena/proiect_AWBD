@@ -1,3 +1,7 @@
+logging:
+  level:
+    bankingService.demo: DEBUG
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/awbd
