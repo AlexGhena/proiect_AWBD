@@ -16,3 +16,11 @@ agent/
 # Application logs
 logs/
 *.log
+
+# Frontend (Angular) build artifacts and dependencies
+**/node_modules/
+**/dist/
+**/.angular/
+**/npm-debug.log*
+**/yarn-error.log*
+**/coverage/
