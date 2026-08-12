@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f4f6f8;
+}
+
+.dashboard {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0f2942;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  color: #0f2942;
+  border: 1px solid #c6cfd8;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.placeholder {
+  margin-top: 2rem;
+  color: #55636f;
+}

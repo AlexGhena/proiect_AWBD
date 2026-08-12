@@ -1,0 +1,13 @@
+<main class="dashboard">
+  <header class="dashboard-header">
+    <h1>
+      @if (currentUser(); as user) {
+        Welcome back, {{ user.username }}
+      } @else {
+        Welcome back
+      }
+    </h1>
+    <button type="button" (click)="logout()">Log out</button>
+  </header>
+  <p class="placeholder">Account summaries and recent transactions will appear here.</p>
+</main>
