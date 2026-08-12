@@ -1,0 +1,38 @@
+<main class="login">
+  <section class="login-card">
+    <h1>Sign in</h1>
+    <p class="subtitle">Access your accounts securely.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label for="username">Username</label>
+      <input id="username" type="text" formControlName="username" autocomplete="username" />
+      @if (form.controls.username.invalid && form.controls.username.touched) {
+        <p class="field-error">Username is required.</p>
+      }
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+      />
+      @if (form.controls.password.invalid && form.controls.password.touched) {
+        <p class="field-error">Password must be at least 8 characters.</p>
+      }
+
+      <label class="remember-me">
+        <input type="checkbox" formControlName="rememberMe" />
+        Remember me
+      </label>
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+  </section>
+</main>

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Backend-focused banking coursework project: three independent Spring Boot 4.1 microservices (Java 25) plus a planned Angular frontend (not yet scaffolded — see `docs/BACKEND_ARCHITECTURE.md` §7 for its intended structure). `README.md` and `docs/` define the target architecture; not every item in the grading map there is implemented yet (see "Known gaps" below).
+Backend-focused banking coursework project: three independent Spring Boot 4.1 microservices (Java 25) plus an Angular frontend (`frontend/`, scaffolded — see `docs/BACKEND_ARCHITECTURE.md` §7 for its intended structure). `README.md` and `docs/` define the target architecture; not every item in the grading map there is implemented yet (see "Known gaps" below).
 
 | Service | Port | Owns | Responsibility |
 |---|---|---|---|
@@ -83,6 +83,10 @@ Services never share a database connection or FK across schemas. E.g. `bank_acco
 
 `AppUser` delete is a soft delete (flag + Flyway migration `V4__soft_delete_users.sql`), not a row removal — deleted users are excluded from default `GET /api/users` listing but retrievable via the admin-only `GET /api/users/deleted`. Don't assume delete removes the row when working in userService.
 
+## Frontend design
+
+The Angular frontend must look and feel like a real bank application, not a generic admin/CRUD dashboard: sober, trustworthy visual language (restrained color palette, no playful/consumer-app styling), clear hierarchy for account balances/transactions, data-dense tables for statements, and accessible contrast throughout. Favor patterns familiar from online banking UIs (account summary cards, transaction lists with clear debit/credit signaling, confirmation steps before money-moving actions) over generic component-library defaults.
+
 ## Known gaps vs. `docs/BACKEND_ARCHITECTURE.md`'s grading map
 
-Not yet implemented: Spring Cloud Config, Spring Cloud Kubernetes service discovery (inter-service URLs are plain config-driven `RestClient` base URLs, not `@LoadBalanced`/discovered), Actuator (referenced by `SecurityConfig` request matchers in every service but `spring-boot-starter-actuator` isn't a dependency yet, so those matchers are currently dead), Micrometer/Prometheus/Zipkin, Kubernetes manifests/Ingress, Dockerfiles, CI (GitHub Actions), JaCoCo coverage enforcement, and the Angular frontend itself. Resilience4j *is* implemented, but only for the transactionService→bankingService leg — the bankingService→userService leg (used to validate account ownership) doesn't have the same retry/circuit-breaker treatment yet.
+Not yet implemented: Spring Cloud Config, Spring Cloud Kubernetes service discovery (inter-service URLs are plain config-driven `RestClient` base URLs, not `@LoadBalanced`/discovered), Actuator (referenced by `SecurityConfig` request matchers in every service but `spring-boot-starter-actuator` isn't a dependency yet, so those matchers are currently dead), Micrometer/Prometheus/Zipkin, Kubernetes manifests/Ingress, Dockerfiles, CI (GitHub Actions), JaCoCo coverage enforcement, and most of the Angular frontend's features (scaffolding, HTTP client, and routing shell exist; auth pages and feature screens don't yet). Resilience4j *is* implemented, but only for the transactionService→bankingService leg — the bankingService→userService leg (used to validate account ownership) doesn't have the same retry/circuit-breaker treatment yet.
