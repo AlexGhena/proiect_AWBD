@@ -1,0 +1,41 @@
+<section class="panel">
+  <div class="panel-header">
+    <h2>Roles</h2>
+  </div>
+
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="state-message">Loading…</p>
+  } @else if (rows().length === 0) {
+    <p class="state-message">No roles defined.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (role of rows(); track role.id) {
+            <tr>
+              <td class="mono">{{ role.name }}</td>
+              <td>{{ role.description || '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="changePage($event)"
+    />
+  }
+</section>

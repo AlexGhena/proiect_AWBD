@@ -19,11 +19,13 @@ import userService.demo.adapter.in.web.dto.common.PageResponse;
 import userService.demo.adapter.in.web.dto.role.RoleResponse;
 import userService.demo.adapter.in.web.dto.user.CreateUserRequest;
 import userService.demo.adapter.in.web.dto.user.UpdateUserRequest;
+import userService.demo.adapter.in.web.dto.user.UserApprovalResponse;
 import userService.demo.adapter.in.web.dto.user.UserResponse;
 import userService.demo.adapter.in.web.mapper.RoleWebMapper;
 import userService.demo.adapter.in.web.mapper.UserWebMapper;
 import userService.demo.adapter.in.web.support.PaginationParamsResolver;
 import userService.demo.domain.model.AppUser;
+import userService.demo.domain.model.UserApprovalResult;
 import userService.demo.domain.port.in.RoleUseCase;
 import userService.demo.domain.port.in.UserUseCase;
 
@@ -76,6 +78,30 @@ public class UserController {
         Pageable pageable = pageableResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
         Page<UserResponse> result = userUseCase.listDeletedUsers(pageable).map(userMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(result));
+    }
+
+    /** Admin-only: accounts awaiting an approve/reject decision. */
+    @GetMapping("/pending")
+    public ResponseEntity<PageResponse<UserResponse>> listPending(@RequestParam(required = false) Integer page,
+                                                                     @RequestParam(required = false) Integer size,
+                                                                     @RequestParam(required = false) String sortBy,
+                                                                     @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = pageableResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<UserResponse> result = userUseCase.listPendingUsers(pageable).map(userMapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
+
+    /** Admin-only: grants ROLE_USER, enables login, and provisions a bank account with a fresh IBAN. */
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<UserApprovalResponse> approve(@PathVariable UUID id) {
+        UserApprovalResult result = userUseCase.approveUser(id);
+        return ResponseEntity.ok(new UserApprovalResponse(userMapper.toResponse(result.user()), result.iban()));
+    }
+
+    /** Admin-only: rejects a pending registration. The account stays disabled and roleless. */
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<UserResponse> reject(@PathVariable UUID id) {
+        return ResponseEntity.ok(userMapper.toResponse(userUseCase.rejectUser(id)));
     }
 
     @PutMapping("/{id}")

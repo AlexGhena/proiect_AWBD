@@ -10,6 +10,14 @@ public interface AccountUseCase {
 
     BankAccount createAccount(BankAccount account);
 
+    /**
+     * Opens an account with a freshly generated IBAN, for a user whose registration userService just
+     * approved. Reached only via {@code /internal/accounts/provision} - any authenticated caller, not
+     * gated by resource ownership - since userService already established the caller is entitled to
+     * act on this user's behalf.
+     */
+    BankAccount provisionAccount(UUID userId, String currency);
+
     BankAccount getAccount(UUID id);
 
     Page<BankAccount> listAccounts(Pageable pageable);

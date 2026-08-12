@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import userService.demo.security.AuthenticatedUser;
 import userService.demo.security.AuthenticatedUserResolver;
 import userService.demo.domain.exception.DuplicateResourceException;
+import userService.demo.domain.exception.InvalidRegistrationStateException;
 import userService.demo.domain.exception.ResourceNotFoundException;
+import userService.demo.domain.model.ApprovalStatus;
 import userService.demo.domain.model.AppUser;
 import userService.demo.domain.model.Role;
+import userService.demo.domain.model.UserApprovalResult;
 import userService.demo.domain.port.in.UserUseCase;
+import userService.demo.domain.port.out.BankingServiceClientPort;
 import userService.demo.domain.port.out.PasswordHasherPort;
 import userService.demo.domain.port.out.RoleRepositoryPort;
 import userService.demo.domain.port.out.UserRepositoryPort;
@@ -34,17 +38,16 @@ public class UserService implements UserUseCase {
     private final UserRoleRepositoryPort userRoleRepositoryPort;
     private final PasswordHasherPort passwordHasherPort;
     private final AuthenticatedUserResolver authenticatedUserResolver;
+    private final BankingServiceClientPort bankingServiceClientPort;
 
     @Override
     public AppUser register(AppUser user, String rawPassword) {
-        // Force the account active and unprivileged: registration input never decides either.
-        user.setEnabled(true);
+        // Registration input never decides this: every self-registered account starts disabled,
+        // roleless and PENDING until an administrator approves it.
+        user.setEnabled(false);
+        user.setApprovalStatus(ApprovalStatus.PENDING);
         AppUser created = persistNewUser(user, rawPassword);
-
-        Role defaultRole = roleRepositoryPort.findByName(DEFAULT_ROLE)
-                .orElseThrow(() -> new IllegalStateException(DEFAULT_ROLE + " is missing from the roles table"));
-        userRoleRepositoryPort.assign(created.getId(), defaultRole.getId());
-        log.info("User registered with id={}, assigned role={}", created.getId(), DEFAULT_ROLE);
+        log.info("User registered pending admin approval: id={}", created.getId());
         return created;
     }
 
@@ -70,6 +73,11 @@ public class UserService implements UserUseCase {
         user.setPasswordHash(passwordHasherPort.hash(rawPassword));
         if (user.getEnabled() == null) {
             user.setEnabled(true);
+        }
+        // Only self-registration sets this explicitly (to PENDING); admin-created users skip the
+        // approval queue entirely.
+        if (user.getApprovalStatus() == null) {
+            user.setApprovalStatus(ApprovalStatus.APPROVED);
         }
         AppUser saved = userRepositoryPort.save(user);
         log.info("User created with id={}, username={}", saved.getId(), saved.getUsername());
@@ -98,6 +106,56 @@ public class UserService implements UserUseCase {
     public Page<AppUser> listDeletedUsers(Pageable pageable) {
         log.debug("Listing soft-deleted users with pageable={}", pageable);
         return userRepositoryPort.findAllDeleted(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<AppUser> listPendingUsers(Pageable pageable) {
+        log.debug("Listing pending users with pageable={}", pageable);
+        return userRepositoryPort.findAllByApprovalStatus(ApprovalStatus.PENDING, pageable);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserApprovalResult approveUser(UUID id) {
+        AppUser user = userRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User " + id + " not found"));
+        if (user.getApprovalStatus() != ApprovalStatus.PENDING) {
+            throw new InvalidRegistrationStateException(
+                    "User " + id + " is not pending approval (status=" + user.getApprovalStatus() + ")");
+        }
+
+        Role defaultRole = roleRepositoryPort.findByName(DEFAULT_ROLE)
+                .orElseThrow(() -> new IllegalStateException(DEFAULT_ROLE + " is missing from the roles table"));
+        userRoleRepositoryPort.assign(user.getId(), defaultRole.getId());
+
+        user.setEnabled(true);
+        user.setApprovalStatus(ApprovalStatus.APPROVED);
+        AppUser saved = userRepositoryPort.save(user);
+
+        // Called last and inside the same transaction: if bankingService cannot provision the
+        // account, the role grant and enable/approve above roll back too, so the admin can retry
+        // approve() cleanly instead of leaving a half-approved user with no account.
+        String iban = bankingServiceClientPort.provisionAccount(saved.getId());
+
+        log.info("Approved user id={}, assigned role={}, provisioned account iban={}", saved.getId(), DEFAULT_ROLE, iban);
+        return UserApprovalResult.builder().user(saved).iban(iban).build();
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public AppUser rejectUser(UUID id) {
+        AppUser user = userRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User " + id + " not found"));
+        if (user.getApprovalStatus() != ApprovalStatus.PENDING) {
+            throw new InvalidRegistrationStateException(
+                    "User " + id + " is not pending approval (status=" + user.getApprovalStatus() + ")");
+        }
+        user.setApprovalStatus(ApprovalStatus.REJECTED);
+        AppUser saved = userRepositoryPort.save(user);
+        log.info("Rejected user id={}", saved.getId());
+        return saved;
     }
 
     @Override

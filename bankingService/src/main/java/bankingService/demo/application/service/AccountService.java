@@ -44,6 +44,7 @@ public class AccountService implements AccountUseCase, AccountTransferUseCase {
     private final UserServiceClient userServiceClient;
     private final AuthenticatedUserResolver authenticatedUserResolver;
     private final IdempotencyStore idempotencyStore;
+    private final IbanGenerator ibanGenerator;
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isSelf(#account.userId)")
@@ -65,6 +66,21 @@ public class AccountService implements AccountUseCase, AccountTransferUseCase {
         }
         BankAccount saved = accountRepositoryPort.save(account);
         log.info("Bank account created with id={}, userId={}", saved.getId(), saved.getUserId());
+        return saved;
+    }
+
+    @Override
+    public BankAccount provisionAccount(UUID userId, String currency) {
+        String iban = ibanGenerator.generate();
+        BankAccount account = BankAccount.builder()
+                .userId(userId)
+                .iban(iban)
+                .currency(currency)
+                .balance(BigDecimal.ZERO)
+                .status(AccountStatus.ACTIVE)
+                .build();
+        BankAccount saved = accountRepositoryPort.save(account);
+        log.info("Provisioned bank account id={}, userId={}, iban={}", saved.getId(), userId, iban);
         return saved;
     }
 

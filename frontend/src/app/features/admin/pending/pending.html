@@ -1,0 +1,100 @@
+<section class="panel">
+  <div class="panel-header">
+    <h2>Pending approvals</h2>
+  </div>
+
+  @if (successMessage()) {
+    <p class="success-banner">{{ successMessage() }}</p>
+  }
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="state-message">Loading…</p>
+  } @else if (rows().length === 0) {
+    <p class="state-message">No registrations are waiting for review.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sortByField('username')">
+              Username
+              @if (sortBy() === 'username') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th class="sortable" (click)="sortByField('email')">
+              Email
+              @if (sortBy() === 'email') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th class="sortable" (click)="sortByField('createdAt')">
+              Requested
+              @if (sortBy() === 'createdAt') {
+                <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of rows(); track user.id) {
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.createdAt | date: 'medium' }}</td>
+              <td>
+                @if (confirming()?.id === user.id && confirming()?.action === 'approve') {
+                  <div class="inline-confirm">
+                    <span>Approve {{ user.username }} and open an account?</span>
+                    <button
+                      type="button"
+                      class="action-approve"
+                      [disabled]="pendingActionId() === user.id"
+                      (click)="confirmApprove(user)"
+                    >
+                      Confirm
+                    </button>
+                    <button type="button" class="action-cancel" (click)="cancelConfirm()">Cancel</button>
+                  </div>
+                } @else if (confirming()?.id === user.id && confirming()?.action === 'reject') {
+                  <div class="inline-confirm">
+                    <span>Reject {{ user.username }}?</span>
+                    <button
+                      type="button"
+                      class="action-reject"
+                      [disabled]="pendingActionId() === user.id"
+                      (click)="confirmReject(user)"
+                    >
+                      Confirm
+                    </button>
+                    <button type="button" class="action-cancel" (click)="cancelConfirm()">Cancel</button>
+                  </div>
+                } @else {
+                  <div class="row-actions">
+                    <button type="button" class="action-approve" (click)="requestConfirm(user.id, 'approve')">
+                      Approve
+                    </button>
+                    <button type="button" class="action-reject" (click)="requestConfirm(user.id, 'reject')">
+                      Reject
+                    </button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="changePage($event)"
+    />
+  }
+</section>

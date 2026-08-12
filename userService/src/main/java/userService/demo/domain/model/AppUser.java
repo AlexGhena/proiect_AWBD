@@ -19,6 +19,7 @@ public class AppUser {
     private String email;
     private String passwordHash;
     private Boolean enabled;
+    private ApprovalStatus approvalStatus;
     private Instant createdAt;
     private Instant updatedAt;
     private Instant deletedAt;

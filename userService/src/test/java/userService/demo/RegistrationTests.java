@@ -53,8 +53,8 @@ class RegistrationTests {
     }
 
     @Test
-    @DisplayName("A self-registered account receives ROLE_USER and nothing more")
-    void registrationGrantsOnlyRoleUser() throws Exception {
+    @DisplayName("A self-registered account is disabled, roleless and PENDING until an admin approves it")
+    void registrationLeavesAccountPendingAndDisabled() throws Exception {
         String username = uniqueUsername();
 
         mockMvc.perform(post("/api/auth/register")
@@ -65,27 +65,20 @@ class RegistrationTests {
                                 """.formatted(username, username)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.enabled").value(false))
+                .andExpect(jsonPath("$.approvalStatus").value("PENDING"))
                 // The password hash must never appear in a response.
                 .andExpect(jsonPath("$.passwordHash").doesNotExist())
                 .andExpect(jsonPath("$.password").doesNotExist());
 
-        String login = mockMvc.perform(post("/api/auth/login")
+        // A PENDING account cannot log in at all - it has no role and login itself is disabled.
+        mockMvc.perform(post("/api/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"%s","password":"RegPassw0rd!","rememberMe":false}
                                 """.formatted(username)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roles", org.hamcrest.Matchers.contains("ROLE_USER")))
-                .andReturn().getResponse().getContentAsString();
-
-        String bearer = "Bearer " + objectMapper.readTree(login).get("accessToken").asString();
-
-        // The new account must not reach anything reserved for administrators.
-        mockMvc.perform(get("/api/roles").header("Authorization", bearer))
-                .andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/users").header("Authorization", bearer))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

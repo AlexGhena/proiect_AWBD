@@ -85,3 +85,16 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.register-link {
+  display: block;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: #0f2942;
+  text-align: center;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}

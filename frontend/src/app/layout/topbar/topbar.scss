@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: #0f2942;
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.brand-mark {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.brand-name {
+  font-size: 0.8rem;
+  color: #a9bdd1;
+}
+
+.primary-nav {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.nav-link {
+  font-size: 0.9rem;
+  color: #c3d2e0;
+  text-decoration: none;
+  cursor: default;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-link.active {
+  color: #fff;
+  border-bottom-color: #4d8ec4;
+}
+
+.account-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.greeting {
+  font-size: 0.9rem;
+  color: #dbe6ef;
+}
+
+.logout-button {
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #3a5876;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: #1a3a5c;
+}

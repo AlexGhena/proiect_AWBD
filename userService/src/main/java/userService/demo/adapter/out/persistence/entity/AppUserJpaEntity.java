@@ -2,6 +2,8 @@ package userService.demo.adapter.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import userService.demo.domain.model.ApprovalStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -41,6 +44,10 @@ public class AppUserJpaEntity {
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status", nullable = false, length = 20)
+    private ApprovalStatus approvalStatus;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, finalize, map, of, switchMap } from 'rxjs';
 
-import { CurrentUser, LoginRequest, LoginResponse } from '../models/auth.model';
+import { CurrentUser, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../models/auth.model';
 import { TokenStore } from './token-store';
 
 const AUTH_BASE = '/api/auth';
@@ -25,6 +25,14 @@ export class AuthService {
         switchMap(() => this.http.post<LoginResponse>(`${AUTH_BASE}/login`, request)),
         map((response) => this.applySession(response)),
       );
+  }
+
+  // The created account is disabled and PENDING - there is no session to start until an admin
+  // approves it, so this never touches the token store.
+  register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http
+      .get(`${AUTH_BASE}/csrf`)
+      .pipe(switchMap(() => this.http.post<RegisterResponse>(`${AUTH_BASE}/register`, request)));
   }
 
   logout(): Observable<void> {
