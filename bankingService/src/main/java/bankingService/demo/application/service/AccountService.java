@@ -6,11 +6,14 @@ import bankingService.demo.domain.model.AccountStatus;
 import bankingService.demo.domain.model.BankAccount;
 import bankingService.demo.domain.port.in.AccountUseCase;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import bankingService.demo.security.AuthenticatedUser;
+import bankingService.demo.security.AuthenticatedUserResolver;
 import bankingService.demo.security.UserServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ public class AccountService implements AccountUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
     private final UserServiceClient userServiceClient;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isSelf(#account.userId)")
@@ -74,6 +78,12 @@ public class AccountService implements AccountUseCase {
             existing.setCurrency(updates.getCurrency());
         }
         if (updates.getBalance() != null) {
+            boolean isAdmin = authenticatedUserResolver.current()
+                    .map(AuthenticatedUser::isAdmin)
+                    .orElse(false);
+            if (!isAdmin) {
+                throw new AccessDeniedException("Only an administrator may modify account balance directly");
+            }
             existing.setBalance(updates.getBalance());
         }
         if (updates.getStatus() != null) {

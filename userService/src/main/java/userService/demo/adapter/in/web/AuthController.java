@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,6 +31,7 @@ import userService.demo.domain.model.AppUser;
 import userService.demo.domain.port.in.UserUseCase;
 import userService.demo.security.AuthenticatedUser;
 import userService.demo.security.AuthenticatedUserResolver;
+import userService.demo.security.LoginAttemptService;
 import userService.demo.security.jwt.AccessToken;
 import userService.demo.security.jwt.AccessTokenIssuer;
 
@@ -52,6 +54,7 @@ public class AuthController {
     private final UserUseCase userUseCase;
     private final UserWebMapper userMapper;
     private final JWKSet jwtPublicJwkSet;
+    private final LoginAttemptService loginAttemptService;
 
     /**
      * Primes the CSRF cookie. Reading the token is what makes the repository write it, so the SPA
@@ -80,6 +83,19 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request,
                                                HttpServletRequest httpRequest,
                                                HttpServletResponse httpResponse) {
+        String usernameKey = "user:" + request.username();
+        String ipKey = "ip:" + httpRequest.getRemoteAddr();
+
+        // Checked (not just recorded) so a locked-out caller never reaches the authentication
+        // manager at all - this is what actually stops further password guessing.
+        if (loginAttemptService.isBlocked(usernameKey) || loginAttemptService.isBlocked(ipKey)) {
+            log.warn("Rejected login for username '{}' from {}: too many recent failed attempts",
+                    request.username(), httpRequest.getRemoteAddr());
+            // Same generic outcome as a bad password, so a locked-out state cannot be used to
+            // enumerate accounts either.
+            throw new LockedException("Invalid username or password");
+        }
+
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -88,8 +104,13 @@ public class AuthController {
             // Same outcome for an unknown username and a wrong password, so the response cannot be
             // used to enumerate accounts.
             log.warn("Failed login attempt for username '{}'", request.username());
+            loginAttemptService.recordFailure(usernameKey);
+            loginAttemptService.recordFailure(ipKey);
             throw new BadCredentialsException("Invalid username or password");
         }
+
+        loginAttemptService.recordSuccess(usernameKey);
+        loginAttemptService.recordSuccess(ipKey);
 
         if (request.rememberMe()) {
             rememberMeServices.loginSuccess(httpRequest, httpResponse, authentication);
