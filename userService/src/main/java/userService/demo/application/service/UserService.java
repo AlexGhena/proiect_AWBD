@@ -197,4 +197,13 @@ public class UserService implements UserUseCase {
         userRepositoryPort.softDelete(id);
         log.info("User soft-deleted with id={}", id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isSelf(#id)")
+    public boolean verifyPassword(UUID id, String rawPassword) {
+        AppUser user = userRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User " + id + " not found"));
+        return passwordHasherPort.matches(rawPassword, user.getPasswordHash());
+    }
 }

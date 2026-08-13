@@ -7,7 +7,7 @@
   <nav class="primary-nav">
     <a routerLink="/dashboard" class="nav-link" [class.active]="active() === 'dashboard'">Dashboard</a>
     <a routerLink="/accounts" class="nav-link" [class.active]="active() === 'accounts'">Accounts</a>
-    <a class="nav-link">Cards</a>
+    <a routerLink="/cards" class="nav-link" [class.active]="active() === 'cards'">Cards</a>
     <a class="nav-link">Transfers</a>
     @if (isAdmin) {
       <a routerLink="/admin" class="nav-link" [class.active]="active() === 'admin'">Admin</a>

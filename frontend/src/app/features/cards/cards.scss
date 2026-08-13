@@ -1,0 +1,303 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f4f6f8;
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cards {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  flex: 1;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0f2942;
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 2rem;
+  color: #55636f;
+  font-size: 0.9rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f2942;
+}
+
+.state-message {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: #55636f;
+}
+
+.empty-state {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: #55636f;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+.error-banner {
+  margin: 1rem 1.25rem 0;
+  padding: 0.6rem 0.85rem;
+  background: #fbe6e6;
+  color: #8a1f1a;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.success-banner {
+  margin: 1rem 1.25rem 0;
+  padding: 0.6rem 0.85rem;
+  background: #e3f5e9;
+  color: #1e7a43;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.mono {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.1rem;
+  padding: 1.25rem;
+}
+
+.bank-card {
+  border-radius: 12px;
+  padding: 1.15rem 1.25rem;
+  background: linear-gradient(135deg, #0f2942 0%, #1c3d5e 100%);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(15, 41, 66, 0.18);
+}
+
+.bank-card-blocked {
+  background: linear-gradient(135deg, #4a5560 0%, #6b7680 100%);
+}
+
+.bank-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bank-card-brand {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #dbe6ef;
+}
+
+.bank-card-number {
+  margin-top: 1.4rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+}
+
+.bank-card-meta {
+  margin-top: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bank-card-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.bank-card-account {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.bank-card-pin {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.meta-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a9bdd1;
+}
+
+.meta-value {
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-active {
+  background: #e3f5e9;
+  color: #1e7a43;
+}
+
+.badge-blocked {
+  background: #fdf1de;
+  color: #9a6a11;
+}
+
+.badge-expired {
+  background: #fbe6e6;
+  color: #b3261e;
+}
+
+.badge-lost {
+  background: #2b1214;
+  color: #ff8a80;
+}
+
+.bank-card-actions {
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.toggle-button {
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: #dbe6ef;
+}
+
+.toggle-button.danger {
+  grid-column: 1 / -1;
+  color: #ff9d97;
+  border-color: rgba(255, 141, 130, 0.45);
+}
+
+.inline-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #dbe6ef;
+}
+
+.inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #a9bdd1;
+}
+
+.inline-form input {
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.inline-form input::placeholder {
+  color: #7f93a6;
+}
+
+.inline-error {
+  margin: 0;
+  color: #ff9d97;
+  font-size: 0.78rem;
+}
+
+.inline-form-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.inline-form-buttons button,
+.inline-confirm button {
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.action-approve {
+  background: #ffffff;
+  color: #1e7a43;
+}
+
+.action-reject {
+  background: #ffffff;
+  color: #b3261e;
+}
+
+.action-cancel {
+  background: transparent;
+  color: #dbe6ef;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

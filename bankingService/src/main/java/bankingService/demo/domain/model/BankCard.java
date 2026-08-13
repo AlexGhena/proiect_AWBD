@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -24,4 +25,12 @@ public class BankCard {
     private CardStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+
+    /** Full PAN, CVV and PIN - decrypted in memory by the persistence mapper, never logged. */
+    @ToString.Exclude
+    private String cardNumber;
+    @ToString.Exclude
+    private String cvv;
+    @ToString.Exclude
+    private String pin;
 }

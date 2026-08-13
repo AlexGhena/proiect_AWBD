@@ -1,6 +1,9 @@
 package bankingService.demo;
 
+import bankingService.demo.domain.model.BankCard;
+import bankingService.demo.domain.model.CardStatus;
 import bankingService.demo.domain.port.out.AccountRepositoryPort;
+import bankingService.demo.domain.port.out.CardRepositoryPort;
 import bankingService.demo.support.TestJwtDecoderConfig;
 import bankingService.demo.support.TestTokens;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +49,9 @@ class AccountProvisioningTests {
     @Autowired
     private AccountRepositoryPort accountRepositoryPort;
 
+    @Autowired
+    private CardRepositoryPort cardRepositoryPort;
+
     private String bearer() {
         return "Bearer " + tokens.validToken(CALLER, "test.user", "ROLE_USER");
     }
@@ -71,6 +78,15 @@ class AccountProvisioningTests {
         assertThat(body.get("status").asString()).isEqualTo("ACTIVE");
 
         assertThat(accountRepositoryPort.existsByIban(body.get("iban").asString())).isTrue();
+
+        UUID accountId = UUID.fromString(body.get("id").asString());
+        List<BankCard> cards = cardRepositoryPort.findByAccountId(accountId);
+        assertThat(cards).hasSize(1);
+        BankCard card = cards.get(0);
+        assertThat(card.getStatus()).isEqualTo(CardStatus.ACTIVE);
+        assertThat(card.getLastFour()).matches("\\d{4}");
+        assertThat(card.getCardReference()).isNotBlank();
+        assertThat(card.getCardholderName()).isNotBlank();
     }
 
     @Test

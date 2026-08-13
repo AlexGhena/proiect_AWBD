@@ -59,6 +59,16 @@ public class BankCardJpaEntity {
     @Column(name = "status", nullable = false, length = 20)
     private CardStatus status;
 
+    /** AES-256-GCM ciphertext, base64-encoded with a random IV prefix. NULL for pre-feature cards. */
+    @Column(name = "card_number_encrypted")
+    private String cardNumberEncrypted;
+
+    @Column(name = "cvv_encrypted")
+    private String cvvEncrypted;
+
+    @Column(name = "pin_encrypted")
+    private String pinEncrypted;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

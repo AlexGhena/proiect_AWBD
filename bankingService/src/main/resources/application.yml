@@ -23,6 +23,11 @@ app:
     # Public verification keys only; the private signing key never leaves userService.
     jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8081/api/auth/jwks.json}
     cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+    # AES-256 key (base64, 32 bytes) encrypting card PAN/CVV/PIN at rest. Must stay stable across
+    # restarts - unlike the JWT signing keys, rotating it makes every previously stored value
+    # undecryptable. Insecure default for local dev only; override via CARD_ENCRYPTION_KEY anywhere
+    # the data needs to persist for real.
+    card-encryption-key: ${CARD_ENCRYPTION_KEY:PE8LEhxTijxHMxQE52u44FmbqMTQOI3z3LWwWKfwjdk=}
 
   clients:
     user-service-url: ${USER_SERVICE_URL:http://localhost:8081}
