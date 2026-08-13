@@ -39,4 +39,12 @@ public interface UserUseCase {
     AppUser updateUser(UUID id, AppUser updates, String rawPassword);
 
     void deleteUser(UUID id);
+
+    /**
+     * Self-service re-authentication check used before sensitive actions elsewhere (e.g. revealing
+     * or changing a bankingService card PIN) - confirms the caller still knows their own current
+     * password without issuing a new token. Never usable on another user's behalf, not even by an
+     * admin, since the point is proving the caller's own identity.
+     */
+    boolean verifyPassword(UUID id, String rawPassword);
 }

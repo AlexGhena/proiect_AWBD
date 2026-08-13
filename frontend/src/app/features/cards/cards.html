@@ -1,0 +1,228 @@
+<div class="app-shell">
+  <app-topbar active="cards" />
+
+  <main class="cards">
+    <h1>My Cards</h1>
+    <p class="page-subtitle">Cards issued on accounts linked to your profile.</p>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Cards</h2>
+      </div>
+
+      @if (successMessage()) {
+        <p class="success-banner">{{ successMessage() }}</p>
+      }
+      @if (error()) {
+        <p class="error-banner" role="alert">{{ error() }}</p>
+      }
+
+      @if (loading()) {
+        <p class="state-message">Loading…</p>
+      } @else if (rows().length === 0) {
+        <div class="empty-state">
+          <p>No cards are linked to your accounts yet.</p>
+        </div>
+      } @else {
+        <div class="card-grid">
+          @for (card of rows(); track card.id) {
+            <article class="bank-card" [class.bank-card-blocked]="card.status !== 'ACTIVE'">
+              <div class="bank-card-header">
+                <span class="bank-card-brand">AWBD</span>
+                <span
+                  class="badge"
+                  [class.badge-active]="card.status === 'ACTIVE'"
+                  [class.badge-blocked]="card.status === 'BLOCKED'"
+                  [class.badge-expired]="card.status === 'EXPIRED'"
+                  [class.badge-lost]="card.status === 'LOST_STOLEN'"
+                >
+                  {{ card.status === 'LOST_STOLEN' ? 'LOST/STOLEN' : card.status }}
+                </span>
+              </div>
+
+              <div class="bank-card-number mono">
+                @if (revealedDetails()[card.id]; as details) {
+                  {{ formatCardNumber(details.cardNumber) }}
+                } @else {
+                  •••• •••• •••• {{ card.lastFour }}
+                }
+              </div>
+
+              <div class="bank-card-meta">
+                <div>
+                  <span class="meta-label">Cardholder</span>
+                  <span class="meta-value">{{ card.cardholderName }}</span>
+                </div>
+                <div>
+                  <span class="meta-label">Expires</span>
+                  <span class="meta-value mono">
+                    {{ card.expiryMonth.toString().padStart(2, '0') }}/{{ (card.expiryYear % 100).toString().padStart(2, '0') }}
+                  </span>
+                </div>
+                @if (revealedDetails()[card.id]; as details) {
+                  <div>
+                    <span class="meta-label">CVV</span>
+                    <span class="meta-value mono">{{ details.cvv }}</span>
+                  </div>
+                }
+              </div>
+
+              @if (revealedPins()[card.id]; as pin) {
+                <div class="bank-card-pin">
+                  <span class="meta-label">PIN</span>
+                  <span class="meta-value mono">{{ pin }}</span>
+                </div>
+              }
+
+              <div class="bank-card-account">
+                <span class="meta-label">Linked account</span>
+                <span class="meta-value mono">{{ card.accountIban }}</span>
+              </div>
+
+              <div class="bank-card-actions">
+                @if (isActionOpen(card.id, 'reveal-details')) {
+                  <div class="inline-form">
+                    <label>
+                      Password
+                      <input
+                        type="password"
+                        [value]="passwordInput()"
+                        (input)="passwordInput.set($any($event.target).value)"
+                        (keydown.enter)="submitRevealDetails(card)"
+                        autocomplete="current-password"
+                      />
+                    </label>
+                    @if (actionError()) {
+                      <p class="inline-error">{{ actionError() }}</p>
+                    }
+                    <div class="inline-form-buttons">
+                      <button type="button" class="action-approve" [disabled]="actionBusy()" (click)="submitRevealDetails(card)">
+                        Show details
+                      </button>
+                      <button type="button" class="action-cancel" (click)="cancelAction()">Cancel</button>
+                    </div>
+                  </div>
+                } @else if (isActionOpen(card.id, 'reveal-pin')) {
+                  <div class="inline-form">
+                    <label>
+                      Password
+                      <input
+                        type="password"
+                        [value]="passwordInput()"
+                        (input)="passwordInput.set($any($event.target).value)"
+                        (keydown.enter)="submitRevealPin(card)"
+                        autocomplete="current-password"
+                      />
+                    </label>
+                    @if (actionError()) {
+                      <p class="inline-error">{{ actionError() }}</p>
+                    }
+                    <div class="inline-form-buttons">
+                      <button type="button" class="action-approve" [disabled]="actionBusy()" (click)="submitRevealPin(card)">
+                        Show PIN
+                      </button>
+                      <button type="button" class="action-cancel" (click)="cancelAction()">Cancel</button>
+                    </div>
+                  </div>
+                } @else if (isActionOpen(card.id, 'change-pin')) {
+                  <div class="inline-form">
+                    <label>
+                      Current password
+                      <input
+                        type="password"
+                        [value]="passwordInput()"
+                        (input)="passwordInput.set($any($event.target).value)"
+                        autocomplete="current-password"
+                      />
+                    </label>
+                    <label>
+                      New PIN (4 digits)
+                      <input
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="4"
+                        [value]="newPinInput()"
+                        (input)="newPinInput.set($any($event.target).value)"
+                        autocomplete="off"
+                      />
+                    </label>
+                    <label>
+                      Confirm new PIN
+                      <input
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="4"
+                        [value]="confirmPinInput()"
+                        (input)="confirmPinInput.set($any($event.target).value)"
+                        (keydown.enter)="submitChangePin(card)"
+                        autocomplete="off"
+                      />
+                    </label>
+                    @if (actionError()) {
+                      <p class="inline-error">{{ actionError() }}</p>
+                    }
+                    <div class="inline-form-buttons">
+                      <button type="button" class="action-approve" [disabled]="actionBusy()" (click)="submitChangePin(card)">
+                        Change PIN
+                      </button>
+                      <button type="button" class="action-cancel" (click)="cancelAction()">Cancel</button>
+                    </div>
+                  </div>
+                } @else if (isActionOpen(card.id, 'report-lost')) {
+                  <div class="inline-confirm">
+                    <span>Report this card lost or stolen? This cannot be undone.</span>
+                    @if (actionError()) {
+                      <p class="inline-error">{{ actionError() }}</p>
+                    }
+                    <div class="inline-form-buttons">
+                      <button type="button" class="action-reject" [disabled]="actionBusy()" (click)="submitReportLost(card)">
+                        Confirm
+                      </button>
+                      <button type="button" class="action-cancel" (click)="cancelAction()">Cancel</button>
+                    </div>
+                  </div>
+                } @else if (isActionOpen(card.id, 'block')) {
+                  <div class="inline-confirm">
+                    <span>{{ card.status === 'ACTIVE' ? 'Block this card?' : 'Unblock this card?' }}</span>
+                    <div class="inline-form-buttons">
+                      <button
+                        type="button"
+                        [class.action-reject]="card.status === 'ACTIVE'"
+                        [class.action-approve]="card.status !== 'ACTIVE'"
+                        [disabled]="actionBusy()"
+                        (click)="submitToggleStatus(card)"
+                      >
+                        Confirm
+                      </button>
+                      <button type="button" class="action-cancel" (click)="cancelAction()">Cancel</button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="action-row">
+                    <button type="button" class="toggle-button" (click)="openAction(card.id, 'reveal-details')">
+                      Show
+                    </button>
+                    <button type="button" class="toggle-button" (click)="openAction(card.id, 'reveal-pin')">
+                      Show PIN
+                    </button>
+                    @if (canManage(card)) {
+                      <button type="button" class="toggle-button" (click)="openAction(card.id, 'change-pin')">
+                        Change PIN
+                      </button>
+                      <button type="button" class="toggle-button" (click)="openAction(card.id, 'block')">
+                        {{ card.status === 'ACTIVE' ? 'Block' : 'Unblock' }}
+                      </button>
+                      <button type="button" class="toggle-button danger" (click)="openAction(card.id, 'report-lost')">
+                        Report lost/stolen
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </main>
+</div>

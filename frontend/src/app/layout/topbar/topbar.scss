@@ -40,9 +40,15 @@
   font-size: 0.9rem;
   color: #c3d2e0;
   text-decoration: none;
-  cursor: default;
+  cursor: pointer;
   padding: 0.25rem 0;
   border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-bottom-color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: #fff;
+  border-bottom-color: #3a5876;
 }
 
 .nav-link.active {

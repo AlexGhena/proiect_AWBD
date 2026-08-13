@@ -4,6 +4,7 @@ import bankingService.demo.domain.exception.DuplicateResourceException;
 import bankingService.demo.domain.exception.IdempotencyConflictException;
 import bankingService.demo.domain.exception.InsufficientFundsException;
 import bankingService.demo.domain.exception.InvalidAccountStateException;
+import bankingService.demo.domain.exception.InvalidCardStateException;
 import bankingService.demo.domain.exception.InvalidPaginationException;
 import bankingService.demo.domain.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({DuplicateResourceException.class, InsufficientFundsException.class,
-            InvalidAccountStateException.class, IdempotencyConflictException.class})
+            InvalidAccountStateException.class, InvalidCardStateException.class, IdempotencyConflictException.class})
     public ProblemDetail handleDuplicate(RuntimeException ex) {
         log.warn("Rejected request due to a conflicting resource state: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());

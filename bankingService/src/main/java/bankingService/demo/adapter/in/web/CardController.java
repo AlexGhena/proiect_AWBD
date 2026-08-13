@@ -1,10 +1,15 @@
 package bankingService.demo.adapter.in.web;
 
+import bankingService.demo.adapter.in.web.dto.card.CardDetailsResponse;
+import bankingService.demo.adapter.in.web.dto.card.CardPinResponse;
 import bankingService.demo.adapter.in.web.dto.card.CardResponse;
+import bankingService.demo.adapter.in.web.dto.card.ChangePinRequest;
 import bankingService.demo.adapter.in.web.dto.card.CreateCardRequest;
+import bankingService.demo.adapter.in.web.dto.card.PasswordConfirmationRequest;
 import bankingService.demo.adapter.in.web.dto.card.UpdateCardRequest;
 import bankingService.demo.adapter.in.web.mapper.CardWebMapper;
 import bankingService.demo.domain.model.BankCard;
+import bankingService.demo.domain.model.RevealedCardDetails;
 import bankingService.demo.domain.port.in.CardUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +73,32 @@ public class CardController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         cardUseCase.deleteCard(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/api/cards/{id}/reveal")
+    public ResponseEntity<CardDetailsResponse> reveal(@PathVariable UUID id,
+                                                         @Valid @RequestBody PasswordConfirmationRequest request) {
+        RevealedCardDetails details = cardUseCase.revealDetails(id, request.password());
+        return ResponseEntity.ok(new CardDetailsResponse(details.cardNumber(), details.cvv(),
+                details.cardholderName(), details.expiryMonth(), details.expiryYear()));
+    }
+
+    @PostMapping("/api/cards/{id}/pin/reveal")
+    public ResponseEntity<CardPinResponse> revealPin(@PathVariable UUID id,
+                                                        @Valid @RequestBody PasswordConfirmationRequest request) {
+        String pin = cardUseCase.revealPin(id, request.password());
+        return ResponseEntity.ok(new CardPinResponse(pin));
+    }
+
+    @PutMapping("/api/cards/{id}/pin")
+    public ResponseEntity<Void> changePin(@PathVariable UUID id, @Valid @RequestBody ChangePinRequest request) {
+        cardUseCase.changePin(id, request.currentPassword(), request.newPin());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/api/cards/{id}/report-lost")
+    public ResponseEntity<CardResponse> reportLost(@PathVariable UUID id) {
+        BankCard updated = cardUseCase.reportLostOrStolen(id);
+        return ResponseEntity.ok(mapper.toResponse(updated));
     }
 }

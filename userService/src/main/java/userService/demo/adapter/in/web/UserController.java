@@ -21,6 +21,8 @@ import userService.demo.adapter.in.web.dto.user.CreateUserRequest;
 import userService.demo.adapter.in.web.dto.user.UpdateUserRequest;
 import userService.demo.adapter.in.web.dto.user.UserApprovalResponse;
 import userService.demo.adapter.in.web.dto.user.UserResponse;
+import userService.demo.adapter.in.web.dto.user.VerifyPasswordRequest;
+import userService.demo.adapter.in.web.dto.user.VerifyPasswordResponse;
 import userService.demo.adapter.in.web.mapper.RoleWebMapper;
 import userService.demo.adapter.in.web.mapper.UserWebMapper;
 import userService.demo.adapter.in.web.support.PaginationParamsResolver;
@@ -114,6 +116,19 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         userUseCase.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Self-service re-authentication check, called by bankingService (with the caller's own token
+     * forwarded) before revealing or changing a card PIN. Always 200 with a boolean body rather than
+     * 401/403 on a mismatch - a wrong password here is a normal business outcome, not an auth failure
+     * of this request itself.
+     */
+    @PostMapping("/{id}/verify-password")
+    public ResponseEntity<VerifyPasswordResponse> verifyPassword(@PathVariable UUID id,
+                                                                    @Valid @RequestBody VerifyPasswordRequest request) {
+        boolean valid = userUseCase.verifyPassword(id, request.password());
+        return ResponseEntity.ok(new VerifyPasswordResponse(valid));
     }
 
     @GetMapping("/{userId}/roles")
