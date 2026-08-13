@@ -10,7 +10,7 @@
   flex-direction: column;
 }
 
-.dashboard {
+.accounts {
   max-width: 960px;
   width: 100%;
   margin: 0 auto;
@@ -34,7 +34,6 @@ h1 {
   background: #ffffff;
   border: 1px solid #dde3ea;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
   overflow: hidden;
 }
 
@@ -42,6 +41,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #eef1f4;
 }
@@ -50,6 +51,40 @@ h1 {
   margin: 0;
   font-size: 1rem;
   color: #0f2942;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #55636f;
+}
+
+.sort-controls button {
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #c6cfd8;
+  background: #ffffff;
+  color: #33414d;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.sort-controls button.active {
+  border-color: #0f2942;
+  color: #0f2942;
+  font-weight: 600;
+}
+
+.sort-indicator {
+  margin-left: 0.15rem;
+}
+
+.state-message {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: #55636f;
 }
 
 .empty-state {
@@ -68,17 +103,6 @@ h1 {
   color: #8a97a3;
 }
 
-.panel-link {
-  font-size: 0.82rem;
-  color: #0f2942;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.panel-link:hover {
-  text-decoration: underline;
-}
-
 .error-banner {
   margin: 1rem 1.25rem 0;
   padding: 0.6rem 0.85rem;
@@ -90,23 +114,28 @@ h1 {
 
 .account-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
   padding: 1.25rem;
 }
 
 .account-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   border: 1px solid #dde3ea;
   border-radius: 8px;
   padding: 1rem 1.1rem;
 }
 
+.account-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .account-iban {
-  font-size: 0.8rem;
-  color: #55636f;
+  color: #33414d;
+  font-size: 0.82rem;
+  word-break: break-all;
 }
 
 .mono {
@@ -114,81 +143,44 @@ h1 {
 }
 
 .account-balance {
-  font-size: 1.3rem;
+  margin-top: 0.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #0f2942;
 }
 
-.table-scroll {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-
-.data-table th {
-  text-align: left;
-  padding: 0.7rem 1.25rem;
-  color: #55636f;
-  font-weight: 600;
+.account-meta {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
   font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  border-bottom: 1px solid #eef1f4;
-  white-space: nowrap;
-}
-
-.data-table td {
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid #f3f5f7;
-  color: #1c2733;
-  vertical-align: middle;
-}
-
-.data-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table th.amount-col,
-.data-table td.amount-col {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-col {
-  font-weight: 600;
-}
-
-.data-table td.amount-credit {
-  color: #1e7a43;
-}
-
-.data-table td.amount-debit {
-  color: #b3261e;
+  color: #8a97a3;
 }
 
 .badge {
   display: inline-block;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.badge-completed {
+.badge-active {
   background: #e3f5e9;
   color: #1e7a43;
 }
 
-.badge-pending {
+.badge-blocked {
   background: #fdf1de;
   color: #9a6a11;
 }
 
-.badge-failed {
+.badge-closed {
   background: #fbe6e6;
   color: #b3261e;
+}
+
+.pagination-wrap {
+  padding: 0.5rem 1.25rem 1.25rem;
 }

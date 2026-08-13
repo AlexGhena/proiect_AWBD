@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,5 +46,28 @@ public class BankingAccountClient {
             log.error("Could not verify account ownership with bankingService: {}", ex.getMessage());
             return false;
         }
+    }
+
+    /** The account ids bankingService considers to belong to the caller, per their own token. */
+    public List<UUID> callerAccountIds() {
+        try {
+            AccountsPageResponse page = restClient.get()
+                    .uri("/api/accounts/me?size=100")
+                    .retrieve()
+                    .body(AccountsPageResponse.class);
+            return page == null ? List.of() : page.content().stream().map(AccountRef::id).toList();
+        } catch (RestClientResponseException ex) {
+            log.debug("bankingService refused /api/accounts/me with status {}", ex.getStatusCode());
+            return List.of();
+        } catch (RuntimeException ex) {
+            log.error("Could not fetch the caller's accounts from bankingService: {}", ex.getMessage());
+            return List.of();
+        }
+    }
+
+    private record AccountsPageResponse(List<AccountRef> content) {
+    }
+
+    private record AccountRef(UUID id) {
     }
 }

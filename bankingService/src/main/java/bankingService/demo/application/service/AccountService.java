@@ -101,6 +101,15 @@ public class AccountService implements AccountUseCase, AccountTransferUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<BankAccount> listMyAccounts(Pageable pageable) {
+        UUID callerId = authenticatedUserResolver.current()
+                .map(AuthenticatedUser::id)
+                .orElseThrow(() -> new AccessDeniedException("Authentication required"));
+        return accountRepositoryPort.findByUserId(callerId, pageable);
+    }
+
+    @Override
     @PreAuthorize("hasRole('ADMIN') or @accountSecurity.ownsAccount(#id)")
     public BankAccount updateAccount(UUID id, BankAccount updates) {
         BankAccount existing = getAccount(id);

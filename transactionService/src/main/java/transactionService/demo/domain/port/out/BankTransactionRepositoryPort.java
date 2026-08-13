@@ -20,6 +20,8 @@ public interface BankTransactionRepositoryPort {
 
     Page<BankTransaction> findAll(Pageable pageable);
 
+    Page<BankTransaction> findByAccountIdIn(List<UUID> accountIds, Pageable pageable);
+
     List<BankTransaction> findByScheduledTransactionId(UUID scheduledTransactionId);
 
     void deleteById(UUID id);

@@ -22,6 +22,8 @@ public interface AccountUseCase {
 
     Page<BankAccount> listAccounts(Pageable pageable);
 
+    Page<BankAccount> listMyAccounts(Pageable pageable);
+
     BankAccount updateAccount(UUID id, BankAccount updates);
 
     void deleteAccount(UUID id);

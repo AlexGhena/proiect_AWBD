@@ -19,5 +19,7 @@ public interface AccountRepositoryPort {
 
     Page<BankAccount> findAll(Pageable pageable);
 
+    Page<BankAccount> findByUserId(UUID userId, Pageable pageable);
+
     void deleteById(UUID id);
 }

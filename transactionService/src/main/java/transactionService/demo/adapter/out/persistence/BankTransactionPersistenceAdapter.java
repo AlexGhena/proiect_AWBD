@@ -60,6 +60,12 @@ public class BankTransactionPersistenceAdapter implements BankTransactionReposit
     }
 
     @Override
+    public Page<BankTransaction> findByAccountIdIn(List<UUID> accountIds, Pageable pageable) {
+        return repository.findBySourceAccountIdInOrDestinationAccountIdIn(accountIds, accountIds, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<BankTransaction> findByScheduledTransactionId(UUID scheduledTransactionId) {
         return repository.findByScheduledTransaction_Id(scheduledTransactionId).stream()
                 .map(mapper::toDomain)

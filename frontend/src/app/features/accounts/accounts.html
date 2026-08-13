@@ -1,0 +1,83 @@
+<div class="app-shell">
+  <app-topbar active="accounts" />
+
+  <main class="accounts">
+    <h1>My Accounts</h1>
+    <p class="page-subtitle">All accounts opened under your profile.</p>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Accounts</h2>
+        <div class="sort-controls">
+          <span>Sort by</span>
+          <button type="button" [class.active]="sortBy() === 'createdAt'" (click)="sortByField('createdAt')">
+            Date opened
+            @if (sortBy() === 'createdAt') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+          <button type="button" [class.active]="sortBy() === 'balance'" (click)="sortByField('balance')">
+            Balance
+            @if (sortBy() === 'balance') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+          <button type="button" [class.active]="sortBy() === 'iban'" (click)="sortByField('iban')">
+            IBAN
+            @if (sortBy() === 'iban') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (error()) {
+        <p class="error-banner" role="alert">{{ error() }}</p>
+      }
+
+      @if (loading()) {
+        <p class="state-message">Loading…</p>
+      } @else if (rows().length === 0) {
+        <div class="empty-state">
+          <p>No accounts are linked to your profile yet.</p>
+          <p class="empty-state-hint">
+            Once your registration is approved, an account with a dedicated IBAN is opened for you
+            automatically.
+          </p>
+        </div>
+      } @else {
+        <div class="account-grid">
+          @for (account of rows(); track account.id) {
+            <article class="account-card">
+              <div class="account-card-header">
+                <span class="account-iban mono">{{ account.iban }}</span>
+                <span
+                  class="badge"
+                  [class.badge-active]="account.status === 'ACTIVE'"
+                  [class.badge-blocked]="account.status === 'BLOCKED'"
+                  [class.badge-closed]="account.status === 'CLOSED'"
+                >
+                  {{ account.status }}
+                </span>
+              </div>
+              <div class="account-balance">{{ account.balance | currency: account.currency }}</div>
+              <div class="account-meta">
+                <span>{{ account.currency }} account</span>
+                <span>Opened {{ account.createdAt | date: 'mediumDate' }}</span>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div class="pagination-wrap">
+          <app-pagination
+            [page]="page()"
+            [totalPages]="totalPages()"
+            [totalElements]="totalElements()"
+            (pageChange)="changePage($event)"
+          />
+        </div>
+      }
+    </section>
+  </main>
+</div>

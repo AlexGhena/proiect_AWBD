@@ -69,6 +69,16 @@ public class TransactionController {
         return ResponseEntity.ok(PageResponse.of(result));
     }
 
+    @GetMapping("/api/transactions/me")
+    public ResponseEntity<PageResponse<TransactionResponse>> listMine(@RequestParam(required = false) Integer page,
+                                                                         @RequestParam(required = false) Integer size,
+                                                                         @RequestParam(required = false) String sortBy,
+                                                                         @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = paginationParamsResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<TransactionResponse> result = bankTransactionUseCase.listMyTransactions(pageable).map(mapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
+
     @GetMapping("/api/scheduled-transactions/{scheduledTransactionId}/transactions")
     public ResponseEntity<List<TransactionResponse>> listBySchedule(@PathVariable UUID scheduledTransactionId) {
         List<TransactionResponse> transactions =

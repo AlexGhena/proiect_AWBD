@@ -48,6 +48,11 @@ public class BankAccountPersistenceAdapter implements AccountRepositoryPort {
     }
 
     @Override
+    public Page<BankAccount> findByUserId(UUID userId, Pageable pageable) {
+        return repository.findByUserId(userId, pageable).map(mapper::toDomain);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         repository.deleteById(id);
     }

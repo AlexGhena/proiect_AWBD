@@ -108,6 +108,15 @@ class TransactionSecurityTests {
     }
 
     @Test
+    @DisplayName("GET /api/transactions/me is reachable by any authenticated user and fails closed to empty when bankingService is unreachable")
+    void listMineIsSelfScopedAndFailsClosed() throws Exception {
+        mockMvc.perform(get("/api/transactions/me").header("Authorization", userBearer()))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .jsonPath("$.content").isEmpty());
+    }
+
+    @Test
     @DisplayName("An ownership check that cannot reach bankingService denies rather than allows")
     void unreachableOwnershipCheckFailsClosed() throws Exception {
         // bankingService is unreachable in this profile, so the cross-service check cannot succeed.

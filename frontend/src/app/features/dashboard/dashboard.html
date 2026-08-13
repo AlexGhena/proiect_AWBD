@@ -14,23 +14,90 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Accounts</h2>
+        @if (accountsTotal() > accounts().length) {
+          <a routerLink="/accounts" class="panel-link">View all accounts</a>
+        }
       </div>
-      <div class="empty-state">
-        <p>No accounts are linked to your profile yet.</p>
-        <p class="empty-state-hint">
-          Once your registration is approved, an account with a dedicated IBAN is opened for you
-          automatically.
-        </p>
-      </div>
+
+      @if (accountsError()) {
+        <p class="error-banner" role="alert">{{ accountsError() }}</p>
+      } @else if (accountsLoading()) {
+        <p class="state-message">Loading…</p>
+      } @else if (accounts().length === 0) {
+        <div class="empty-state">
+          <p>No accounts are linked to your profile yet.</p>
+          <p class="empty-state-hint">
+            Once your registration is approved, an account with a dedicated IBAN is opened for you
+            automatically.
+          </p>
+        </div>
+      } @else {
+        <div class="account-grid">
+          @for (account of accounts(); track account.id) {
+            <article class="account-card">
+              <span class="account-iban mono">{{ account.iban }}</span>
+              <span class="account-balance">{{ account.balance | currency: account.currency }}</span>
+            </article>
+          }
+        </div>
+      }
     </section>
 
     <section class="panel">
       <div class="panel-header">
         <h2>Recent transactions</h2>
       </div>
-      <div class="empty-state">
-        <p>No recent activity to show.</p>
-      </div>
+
+      @if (transactionsError()) {
+        <p class="error-banner" role="alert">{{ transactionsError() }}</p>
+      } @else if (transactionsLoading()) {
+        <p class="state-message">Loading…</p>
+      } @else if (transactions().length === 0) {
+        <div class="empty-state">
+          <p>No recent activity to show.</p>
+        </div>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th class="amount-col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transaction of transactions(); track transaction.id) {
+                <tr>
+                  <td>{{ transaction.description || transaction.type }}</td>
+                  <td>
+                    <span
+                      class="badge"
+                      [class.badge-completed]="transaction.status === 'COMPLETED'"
+                      [class.badge-pending]="transaction.status === 'PENDING'"
+                      [class.badge-failed]="
+                        transaction.status === 'FAILED' || transaction.status === 'COMPENSATED'
+                      "
+                    >
+                      {{ transaction.status }}
+                    </span>
+                  </td>
+                  <td>{{ transaction.createdAt | date: 'medium' }}</td>
+                  <td
+                    class="amount-col"
+                    [class.amount-credit]="direction(transaction) === 'credit'"
+                    [class.amount-debit]="direction(transaction) === 'debit'"
+                  >
+                    {{ direction(transaction) === 'debit' ? '−' : direction(transaction) === 'credit' ? '+' : '' }}
+                    {{ transaction.amount | currency: transaction.currency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </section>
   </main>
 </div>

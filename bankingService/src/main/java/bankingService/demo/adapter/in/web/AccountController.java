@@ -60,6 +60,16 @@ public class AccountController {
         return ResponseEntity.ok(PageResponse.of(result));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<PageResponse<AccountResponse>> listMine(@RequestParam(required = false) Integer page,
+                                                                    @RequestParam(required = false) Integer size,
+                                                                    @RequestParam(required = false) String sortBy,
+                                                                    @RequestParam(required = false) String sortDirection) {
+        Pageable pageable = paginationParamsResolver.resolve(page, size, sortBy, sortDirection, SORT_FIELDS, DEFAULT_SORT_FIELD);
+        Page<AccountResponse> result = accountUseCase.listMyAccounts(pageable).map(mapper::toResponse);
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<AccountResponse> update(@PathVariable UUID id,
                                                     @Valid @RequestBody UpdateAccountRequest request) {
