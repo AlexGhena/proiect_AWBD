@@ -15,6 +15,7 @@ import transactionService.demo.domain.port.in.BankTransactionUseCase;
 import transactionService.demo.domain.port.out.BankTransactionRepositoryPort;
 import transactionService.demo.domain.port.out.CategoryRepositoryPort;
 import transactionService.demo.domain.port.out.ScheduledTransactionRepositoryPort;
+import transactionService.demo.security.BankingAccountClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class BankTransactionService implements BankTransactionUseCase {
     private final BankTransactionRepositoryPort bankTransactionRepositoryPort;
     private final CategoryRepositoryPort categoryRepositoryPort;
     private final ScheduledTransactionRepositoryPort scheduledTransactionRepositoryPort;
+    private final BankingAccountClient bankingAccountClient;
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.ownsEitherAccount(#transaction.sourceAccountId, #transaction.destinationAccountId)")
@@ -69,6 +71,16 @@ public class BankTransactionService implements BankTransactionUseCase {
     public Page<BankTransaction> listTransactions(Pageable pageable) {
         log.debug("Listing bank transactions with pageable={}", pageable);
         return bankTransactionRepositoryPort.findAll(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BankTransaction> listMyTransactions(Pageable pageable) {
+        List<UUID> accountIds = bankingAccountClient.callerAccountIds();
+        if (accountIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return bankTransactionRepositoryPort.findByAccountIdIn(accountIds, pageable);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -130,6 +131,16 @@ class AccountSecurityTests {
         mockMvc.perform(get("/api/accounts/" + MIHAI_ACCOUNT)
                         .header("Authorization", bearer(adminToken())))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET /api/accounts/me returns only the caller's own accounts")
+    void listMineReturnsOnlyOwnAccounts() throws Exception {
+        mockMvc.perform(get("/api/accounts/me").header("Authorization", bearer(userToken(ELENA))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].userId", org.hamcrest.Matchers.everyItem(
+                        org.hamcrest.Matchers.equalTo(ELENA.toString()))))
+                .andExpect(jsonPath("$.content[?(@.id=='" + ELENA_ACCOUNT + "')]").exists());
     }
 
     @Test

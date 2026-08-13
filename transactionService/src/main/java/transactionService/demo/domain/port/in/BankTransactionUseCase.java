@@ -15,6 +15,8 @@ public interface BankTransactionUseCase {
 
     Page<BankTransaction> listTransactions(Pageable pageable);
 
+    Page<BankTransaction> listMyTransactions(Pageable pageable);
+
     List<BankTransaction> listTransactionsBySchedule(UUID scheduledTransactionId);
 
     BankTransaction updateTransaction(UUID id, BankTransaction updates);
