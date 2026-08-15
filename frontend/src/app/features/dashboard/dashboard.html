@@ -46,6 +46,9 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Recent transactions</h2>
+        @if (transactionsTotal() > transactions().length) {
+          <a routerLink="/transactions" class="panel-link">View all transactions</a>
+        }
       </div>
 
       @if (transactionsError()) {

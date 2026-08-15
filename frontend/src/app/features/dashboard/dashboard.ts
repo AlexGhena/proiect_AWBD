@@ -30,6 +30,7 @@ export class Dashboard implements OnInit {
   protected readonly accountsError = signal<string | null>(null);
 
   protected readonly transactions = signal<Transaction[]>([]);
+  protected readonly transactionsTotal = signal(0);
   protected readonly transactionsLoading = signal(true);
   protected readonly transactionsError = signal<string | null>(null);
 
@@ -76,6 +77,7 @@ export class Dashboard implements OnInit {
       .subscribe({
         next: (result) => {
           this.transactions.set(result.content);
+          this.transactionsTotal.set(result.totalElements);
           this.transactionsLoading.set(false);
         },
         error: () => {
