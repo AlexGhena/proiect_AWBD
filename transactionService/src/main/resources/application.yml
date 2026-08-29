@@ -12,6 +12,20 @@ logging:
     root: INFO
     transactionService.demo: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,circuitbreakerevents
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+
 app:
   pagination:
     default-size: 20

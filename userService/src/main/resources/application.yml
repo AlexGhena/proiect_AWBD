@@ -12,6 +12,17 @@ logging:
     root: INFO
     userService.demo: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
 app:
   pagination:
     default-size: 20
