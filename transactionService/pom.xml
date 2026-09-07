@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>transactionService</groupId>
 	<artifactId>demo</artifactId>
@@ -46,7 +46,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<!-- Validates the RSA-signed JWTs issued by userService. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
@@ -63,15 +62,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-flyway</artifactId>
 		</dependency>
-		<!-- spring-boot-starter-aop was removed in Boot 4; Spring's proxy-based @Aspect support
-		     (used by resilience4j's @Retry/@CircuitBreaker aspects) still needs aspectjweaver on
-		     the classpath to parse the pointcut expressions. -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.9.25</version>
 		</dependency>
-		<!-- Retry + circuit breaker around the transactionService -> bankingService hop. -->
 		<dependency>
 			<groupId>io.github.resilience4j</groupId>
 			<artifactId>resilience4j-spring-boot4</artifactId>
@@ -107,8 +102,6 @@
 			<artifactId>spring-boot-starter-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Standalone (shaded, Jetty bundled) variant: the thin "wiremock" artifact needs a
-		     separately-added Jetty HttpServerFactory extension to actually start a server. -->
 		<dependency>
 			<groupId>org.wiremock</groupId>
 			<artifactId>wiremock-standalone</artifactId>
@@ -177,11 +170,6 @@
 							<goal>report</goal>
 						</goals>
 					</execution>
-					<!-- Coursework's "min 70% coverage on the service layer" rule. Report-only for now
-					     (haltOnFailure=false): logs a violation when the service layer is under 70% but
-					     does not fail the build, since the CRUD services still need more unit tests.
-					     Flip haltOnFailure to true to make it an enforcing gate. Bound to verify, so
-					     `mvn test` and spring-boot:run stay unaffected either way. -->
 					<execution>
 						<id>check-service-layer</id>
 						<phase>verify</phase>
