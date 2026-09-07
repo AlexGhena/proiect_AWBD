@@ -42,8 +42,12 @@ export class AuthService {
   }
 
   // Exchanges a still-valid remember-me cookie for a fresh access token, e.g. after a page reload.
+  // The CSRF cookie must be primed first: authenticating via the remember-me cookie rotates the
+  // CSRF token server-side, so after a reload there is no valid XSRF-TOKEN cookie for the client to
+  // echo, and POST /token would otherwise be rejected with 403 before the remember-me cookie is read.
   restoreSession(): Observable<CurrentUser | null> {
-    return this.http.post<LoginResponse>(`${AUTH_BASE}/token`, {}).pipe(
+    return this.http.get(`${AUTH_BASE}/csrf`).pipe(
+      switchMap(() => this.http.post<LoginResponse>(`${AUTH_BASE}/token`, {})),
       map((response) => this.applySession(response)),
       catchError(() => {
         this.clearSession();
