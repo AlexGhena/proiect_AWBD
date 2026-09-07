@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
 
-export type TopbarSection = 'dashboard' | 'accounts' | 'cards' | 'admin';
+export type TopbarSection = 'dashboard' | 'accounts' | 'cards' | 'transactions' | 'admin';
 
 @Component({
   selector: 'app-topbar',

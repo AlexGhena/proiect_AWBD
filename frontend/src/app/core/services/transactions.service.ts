@@ -3,12 +3,14 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { PageResponse } from '../models/page.model';
-import { Transaction } from '../models/transaction.model';
+import { Transaction, TransferRequest } from '../models/transaction.model';
+
+export type TransactionSortField = 'amount' | 'status' | 'createdAt';
 
 export interface PageQuery {
   page?: number;
   size?: number;
-  sortBy?: string;
+  sortBy?: TransactionSortField;
   sortDirection?: 'asc' | 'desc';
 }
 
@@ -29,5 +31,9 @@ export class TransactionsService {
 
   listMine(query: PageQuery = {}): Observable<PageResponse<Transaction>> {
     return this.http.get<PageResponse<Transaction>>(`${TRANSACTIONS_BASE}/me`, { params: toParams(query) });
+  }
+
+  transfer(request: TransferRequest): Observable<Transaction> {
+    return this.http.post<Transaction>(`${TRANSACTIONS_BASE}/transfers`, request);
   }
 }

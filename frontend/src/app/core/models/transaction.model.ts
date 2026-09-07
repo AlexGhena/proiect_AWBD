@@ -19,3 +19,12 @@ export interface Transaction {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TransferRequest {
+  categoryId?: string | null;
+  sourceAccountId: string;
+  destinationAccountId: string;
+  amount: number;
+  currency: string;
+  description?: string | null;
+}

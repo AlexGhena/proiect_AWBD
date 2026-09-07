@@ -1,0 +1,271 @@
+<div class="app-shell">
+  <app-topbar active="transactions" />
+
+  <main class="transactions">
+    <h1>Transactions</h1>
+    <p class="page-subtitle">Move money between accounts and review your transaction history.</p>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>New transfer</h2>
+        @if (!formOpen()) {
+          <button type="button" class="primary-button" (click)="openForm()" [disabled]="activeAccounts().length === 0">
+            New transfer
+          </button>
+        }
+      </div>
+
+      @if (successMessage()) {
+        <p class="success-banner">{{ successMessage() }}</p>
+      }
+
+      @if (!formOpen()) {
+        @if (activeAccounts().length === 0) {
+          <div class="empty-state">
+            <p>You need at least one active account to make a transfer.</p>
+          </div>
+        }
+      } @else {
+        <div class="transfer-form">
+          @if (step() === 'form') {
+            <div class="form-grid">
+              <label>
+                From account
+                <select [value]="sourceAccountId()" (change)="sourceAccountId.set($any($event.target).value)">
+                  @for (account of activeAccounts(); track account.id) {
+                    <option [value]="account.id">
+                      {{ account.iban }} — {{ account.balance | currency: account.currency }}
+                    </option>
+                  }
+                </select>
+              </label>
+
+              <div class="destination-field">
+                <span class="field-label">To</span>
+                <div class="destination-toggle">
+                  <button
+                    type="button"
+                    [class.active]="destinationMode() === 'own'"
+                    (click)="setDestinationMode('own')"
+                  >
+                    One of my accounts
+                  </button>
+                  <button
+                    type="button"
+                    [class.active]="destinationMode() === 'external'"
+                    (click)="setDestinationMode('external')"
+                  >
+                    Another account
+                  </button>
+                </div>
+
+                @if (destinationMode() === 'own') {
+                  <select
+                    [value]="destinationAccountId()"
+                    (change)="destinationAccountId.set($any($event.target).value)"
+                  >
+                    <option value="" disabled>Select a destination account</option>
+                    @for (account of eligibleDestinations(); track account.id) {
+                      <option [value]="account.id">
+                        {{ account.iban }} — {{ account.balance | currency: account.currency }}
+                      </option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    type="text"
+                    placeholder="Destination account ID"
+                    [value]="destinationExternalId()"
+                    (input)="destinationExternalId.set($any($event.target).value)"
+                  />
+                }
+              </div>
+
+              <label>
+                Amount
+                <div class="amount-input">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="0.00"
+                    [value]="amountInput()"
+                    (input)="amountInput.set($any($event.target).value)"
+                  />
+                  @if (sourceAccount(); as source) {
+                    <span class="amount-currency">{{ source.currency }}</span>
+                  }
+                </div>
+              </label>
+
+              <label>
+                Category (optional)
+                <select [value]="categoryId()" (change)="categoryId.set($any($event.target).value)">
+                  <option value="">No category</option>
+                  @for (category of categories(); track category.id) {
+                    <option [value]="category.id">{{ category.name }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="description-field">
+                Description (optional)
+                <input
+                  type="text"
+                  placeholder="e.g. Rent, groceries…"
+                  [value]="descriptionInput()"
+                  (input)="descriptionInput.set($any($event.target).value)"
+                />
+              </label>
+            </div>
+
+            @if (formError()) {
+              <p class="inline-error">{{ formError() }}</p>
+            }
+
+            <div class="form-buttons">
+              <button type="button" class="primary-button" (click)="reviewTransfer()">Review transfer</button>
+              <button type="button" class="secondary-button" (click)="closeForm()">Cancel</button>
+            </div>
+          } @else {
+            <div class="confirm-summary">
+              <p class="confirm-title">Confirm this transfer</p>
+              <dl>
+                <div>
+                  <dt>From</dt>
+                  <dd class="mono">{{ sourceAccount()?.iban }}</dd>
+                </div>
+                <div>
+                  <dt>To</dt>
+                  <dd class="mono">{{ destinationAccount()?.iban ?? destinationAccountIdResolved() }}</dd>
+                </div>
+                <div>
+                  <dt>Amount</dt>
+                  <dd class="confirm-amount">
+                    {{ amountInput() | currency: (sourceAccount()?.currency ?? 'USD') }}
+                  </dd>
+                </div>
+                @if (selectedCategory(); as category) {
+                  <div>
+                    <dt>Category</dt>
+                    <dd>{{ category.name }}</dd>
+                  </div>
+                }
+                @if (descriptionInput()) {
+                  <div>
+                    <dt>Description</dt>
+                    <dd>{{ descriptionInput() }}</dd>
+                  </div>
+                }
+              </dl>
+
+              @if (formError()) {
+                <p class="inline-error">{{ formError() }}</p>
+              }
+
+              <div class="form-buttons">
+                <button type="button" class="primary-button" [disabled]="submitting()" (click)="submitTransfer()">
+                  {{ submitting() ? 'Sending…' : 'Confirm transfer' }}
+                </button>
+                <button type="button" class="secondary-button" [disabled]="submitting()" (click)="backToForm()">
+                  Back
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Transaction history</h2>
+        <div class="sort-controls">
+          <span>Sort by</span>
+          <button type="button" [class.active]="sortBy() === 'createdAt'" (click)="sortByField('createdAt')">
+            Date
+            @if (sortBy() === 'createdAt') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+          <button type="button" [class.active]="sortBy() === 'amount'" (click)="sortByField('amount')">
+            Amount
+            @if (sortBy() === 'amount') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+          <button type="button" [class.active]="sortBy() === 'status'" (click)="sortByField('status')">
+            Status
+            @if (sortBy() === 'status') {
+              <span class="sort-indicator">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (error()) {
+        <p class="error-banner" role="alert">{{ error() }}</p>
+      }
+
+      @if (loading()) {
+        <p class="state-message">Loading…</p>
+      } @else if (rows().length === 0) {
+        <div class="empty-state">
+          <p>No transactions to show yet.</p>
+        </div>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th class="amount-col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transaction of rows(); track transaction.id) {
+                <tr>
+                  <td>{{ transaction.description || '—' }}</td>
+                  <td>{{ transaction.type }}</td>
+                  <td>
+                    <span
+                      class="badge"
+                      [class.badge-completed]="transaction.status === 'COMPLETED'"
+                      [class.badge-pending]="transaction.status === 'PENDING'"
+                      [class.badge-failed]="
+                        transaction.status === 'FAILED' || transaction.status === 'COMPENSATED'
+                      "
+                    >
+                      {{ transaction.status }}
+                    </span>
+                  </td>
+                  <td>{{ transaction.createdAt | date: 'medium' }}</td>
+                  <td
+                    class="amount-col"
+                    [class.amount-credit]="direction(transaction) === 'credit'"
+                    [class.amount-debit]="direction(transaction) === 'debit'"
+                  >
+                    {{ direction(transaction) === 'debit' ? '−' : direction(transaction) === 'credit' ? '+' : '' }}
+                    {{ transaction.amount | currency: transaction.currency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrap">
+          <app-pagination
+            [page]="page()"
+            [totalPages]="totalPages()"
+            [totalElements]="totalElements()"
+            (pageChange)="changePage($event)"
+          />
+        </div>
+      }
+    </section>
+  </main>
+</div>
