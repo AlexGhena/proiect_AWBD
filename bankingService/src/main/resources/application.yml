@@ -12,6 +12,20 @@ logging:
     root: INFO
     bankingService.demo: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,circuitbreakerevents
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+
 app:
   pagination:
     default-size: 20
@@ -31,3 +45,20 @@ app:
 
   clients:
     user-service-url: ${USER_SERVICE_URL:http://localhost:8081}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        # A userService business "no" (any 4xx, e.g. 404 unknown user) is handled before it reaches
+        # the breaker, so only transport failures and time-limiter timeouts are recorded as failures.
+  timelimiter:
+    instances:
+      userService:
+        timeout-duration: 2s
+        cancel-running-future: true
