@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>userService</groupId>
 	<artifactId>demo</artifactId>
@@ -42,7 +42,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<!-- Issues and validates the RSA-signed JWTs; also brings spring-security-oauth2-jose. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
@@ -155,11 +154,6 @@
 							<goal>report</goal>
 						</goals>
 					</execution>
-					<!-- Coursework's "min 70% coverage on the service layer" rule. Report-only for now
-					     (haltOnFailure=false): logs a violation when the service layer is under 70% but
-					     does not fail the build, since the CRUD services still need more unit tests.
-					     Flip haltOnFailure to true to make it an enforcing gate. Bound to verify, so
-					     `mvn test` and spring-boot:run stay unaffected either way. -->
 					<execution>
 						<id>check-service-layer</id>
 						<phase>verify</phase>
