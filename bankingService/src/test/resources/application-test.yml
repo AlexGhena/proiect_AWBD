@@ -1,20 +1,18 @@
-# Tests run against a dedicated schema so they never touch the development data.
+# Tests run against an in-memory H2 database so the suite needs no running Postgres.
+# The H2 port of the schema lives in db/h2migration; dev/prod stay on Postgres (db/migration).
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/awbd?currentSchema=banking_test
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: jdbc:h2:mem:bankingdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-    properties:
-      hibernate:
-        default_schema: banking_test
   flyway:
     enabled: true
-    schemas: banking_test
-    default-schema: banking_test
+    locations: classpath:db/h2migration
 
 app:
   security:
