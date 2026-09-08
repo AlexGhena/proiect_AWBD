@@ -1,0 +1,300 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f4f6f8;
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  flex: 1;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0f2942;
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 2rem;
+  color: #55636f;
+  font-size: 0.9rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f2942;
+}
+
+.state-message,
+.empty-state {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: #55636f;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+.error-banner,
+.success-banner,
+.hint-banner {
+  margin: 1rem 1.25rem 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.error-banner {
+  background: #fbe6e6;
+  color: #8a1f1a;
+}
+
+.success-banner {
+  background: #e3f5e9;
+  color: #1e7a43;
+}
+
+.hint-banner {
+  background: #eef2f7;
+  color: #33414d;
+}
+
+.inline-error {
+  margin: 0.75rem 0 0;
+  color: #b3261e;
+  font-size: 0.82rem;
+}
+
+.details-list {
+  margin: 0;
+  padding: 0.5rem 1.25rem 1.25rem;
+}
+
+.details-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #f3f5f7;
+}
+
+.details-list > div:last-child {
+  border-bottom: none;
+}
+
+.details-list dt {
+  color: #55636f;
+  font-size: 0.85rem;
+}
+
+.details-list dd {
+  margin: 0;
+  color: #1c2733;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.entity-form {
+  padding: 1.25rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #55636f;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-grid input,
+.form-grid select {
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #c6cfd8;
+  background: #ffffff;
+  color: #1c2733;
+  font-size: 0.88rem;
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  color: #33414d;
+  font-size: 0.85rem;
+}
+
+.checkbox-field input {
+  width: auto;
+}
+
+.field-error {
+  color: #b3261e;
+  font-size: 0.78rem;
+}
+
+.form-buttons {
+  margin-top: 1.1rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button {
+  padding: 0.5rem 0.95rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.primary-button {
+  border: 1px solid #0f2942;
+  background: #0f2942;
+  color: #fff;
+  font-weight: 600;
+}
+
+.secondary-button {
+  border: 1px solid #c6cfd8;
+  background: #ffffff;
+  color: #33414d;
+}
+
+.danger-button {
+  border: 1px solid #b3261e;
+  background: #b3261e;
+  color: #fff;
+  font-weight: 600;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled,
+.danger-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.address-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #eef1f4;
+  border-radius: 8px;
+}
+
+.address-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.address-label {
+  font-weight: 600;
+  color: #0f2942;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.address-lines {
+  margin: 0;
+  color: #33414d;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-default {
+  background: #e3f0ff;
+  color: #1857a4;
+}
+
+.address-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.confirm-text {
+  font-size: 0.82rem;
+  color: #55636f;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  padding: 0.2rem 0.35rem;
+  color: #1857a4;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.link-button.danger {
+  color: #b3261e;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

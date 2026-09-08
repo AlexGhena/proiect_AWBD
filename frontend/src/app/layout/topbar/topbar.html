@@ -9,6 +9,7 @@
     <a routerLink="/accounts" class="nav-link" [class.active]="active() === 'accounts'">Accounts</a>
     <a routerLink="/cards" class="nav-link" [class.active]="active() === 'cards'">Cards</a>
     <a routerLink="/transactions" class="nav-link" [class.active]="active() === 'transactions'">Transactions</a>
+    <a routerLink="/profile" class="nav-link" [class.active]="active() === 'profile'">Profile</a>
     @if (isAdmin) {
       <a routerLink="/admin" class="nav-link" [class.active]="active() === 'admin'">Admin</a>
     }

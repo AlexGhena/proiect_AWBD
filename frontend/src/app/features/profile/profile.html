@@ -1,0 +1,217 @@
+<div class="app-shell">
+  <app-topbar active="profile" />
+
+  <main class="profile">
+    <h1>My profile</h1>
+    <p class="page-subtitle">Manage your personal details and saved addresses.</p>
+
+    @if (loading()) {
+      <p class="state-message">Loading…</p>
+    } @else if (loadError()) {
+      <p class="error-banner" role="alert">{{ loadError() }}</p>
+    } @else {
+      <!-- Personal details -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Personal details</h2>
+          @if (!editingProfile() && profile()) {
+            <button type="button" class="secondary-button" (click)="startEditProfile()">Edit</button>
+          }
+        </div>
+
+        @if (profileSuccess()) {
+          <p class="success-banner">{{ profileSuccess() }}</p>
+        }
+
+        @if (!editingProfile() && profile(); as p) {
+          <dl class="details-list">
+            <div>
+              <dt>First name</dt>
+              <dd>{{ p.firstName }}</dd>
+            </div>
+            <div>
+              <dt>Last name</dt>
+              <dd>{{ p.lastName }}</dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd>{{ p.phone || '—' }}</dd>
+            </div>
+          </dl>
+        } @else {
+          @if (profileMissing()) {
+            <p class="hint-banner">You don't have a profile yet. Add your details to get started.</p>
+          }
+
+          <form class="entity-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+            <div class="form-grid">
+              <label>
+                First name
+                <input type="text" formControlName="firstName" autocomplete="given-name" />
+                @if (profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched) {
+                  <span class="field-error">First name is required (max 100 characters).</span>
+                }
+              </label>
+
+              <label>
+                Last name
+                <input type="text" formControlName="lastName" autocomplete="family-name" />
+                @if (profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched) {
+                  <span class="field-error">Last name is required (max 100 characters).</span>
+                }
+              </label>
+
+              <label class="full-width">
+                Phone (optional)
+                <input type="tel" formControlName="phone" autocomplete="tel" placeholder="e.g. +40 721 000 000" />
+                @if (profileForm.controls.phone.invalid && profileForm.controls.phone.touched) {
+                  <span class="field-error">Enter a valid phone number (max 30 characters).</span>
+                }
+              </label>
+            </div>
+
+            @if (profileError()) {
+              <p class="inline-error">{{ profileError() }}</p>
+            }
+
+            <div class="form-buttons">
+              <button type="submit" class="primary-button" [disabled]="profileSaving()">
+                {{ profileSaving() ? 'Saving…' : profileMissing() ? 'Create profile' : 'Save changes' }}
+              </button>
+              @if (!profileMissing()) {
+                <button type="button" class="secondary-button" [disabled]="profileSaving()" (click)="cancelEditProfile()">
+                  Cancel
+                </button>
+              }
+            </div>
+          </form>
+        }
+      </section>
+
+      <!-- Addresses -->
+      @if (profile()) {
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Addresses</h2>
+            @if (!addressFormOpen()) {
+              <button type="button" class="primary-button" (click)="openCreateAddress()">Add address</button>
+            }
+          </div>
+
+          @if (addressesError()) {
+            <p class="error-banner" role="alert">{{ addressesError() }}</p>
+          }
+
+          @if (addressFormOpen()) {
+            <form class="entity-form" [formGroup]="addressForm" (ngSubmit)="saveAddress()" novalidate>
+              <div class="form-grid">
+                <label>
+                  Label
+                  <select formControlName="label">
+                    @for (label of labels; track label) {
+                      <option [value]="label">{{ label }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label>
+                  Country
+                  <input type="text" formControlName="country" maxlength="2" placeholder="RO" />
+                  @if (addressForm.controls.country.invalid && addressForm.controls.country.touched) {
+                    <span class="field-error">Use a 2-letter ISO code (e.g. RO).</span>
+                  }
+                </label>
+
+                <label class="full-width">
+                  Street
+                  <input type="text" formControlName="street" autocomplete="address-line1" />
+                  @if (addressForm.controls.street.invalid && addressForm.controls.street.touched) {
+                    <span class="field-error">Street is required (max 150 characters).</span>
+                  }
+                </label>
+
+                <label>
+                  City
+                  <input type="text" formControlName="city" autocomplete="address-level2" />
+                  @if (addressForm.controls.city.invalid && addressForm.controls.city.touched) {
+                    <span class="field-error">City is required (max 100 characters).</span>
+                  }
+                </label>
+
+                <label>
+                  Postal code
+                  <input type="text" formControlName="postalCode" autocomplete="postal-code" />
+                  @if (addressForm.controls.postalCode.invalid && addressForm.controls.postalCode.touched) {
+                    <span class="field-error">Postal code is required (max 20 characters).</span>
+                  }
+                </label>
+
+                <label class="checkbox-field full-width">
+                  <input type="checkbox" formControlName="isDefault" />
+                  Set as my default address
+                </label>
+              </div>
+
+              @if (addressError()) {
+                <p class="inline-error">{{ addressError() }}</p>
+              }
+
+              <div class="form-buttons">
+                <button type="submit" class="primary-button" [disabled]="addressSaving()">
+                  {{ addressSaving() ? 'Saving…' : editingAddressId() ? 'Save address' : 'Add address' }}
+                </button>
+                <button type="button" class="secondary-button" [disabled]="addressSaving()" (click)="closeAddressForm()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+
+          @if (addresses().length === 0) {
+            <div class="empty-state">
+              <p>No addresses saved yet.</p>
+            </div>
+          } @else {
+            <ul class="address-list">
+              @for (address of addresses(); track address.id) {
+                <li class="address-card">
+                  <div class="address-body">
+                    <div class="address-title">
+                      <span class="address-label">{{ address.label }}</span>
+                      @if (address.isDefault) {
+                        <span class="badge badge-default">Default</span>
+                      }
+                    </div>
+                    <p class="address-lines">
+                      {{ address.street }}<br />
+                      {{ address.city }}, {{ address.postalCode }} · {{ address.country }}
+                    </p>
+                  </div>
+                  <div class="address-actions">
+                    @if (confirmingDeleteId() === address.id) {
+                      <span class="confirm-text">Delete?</span>
+                      <button
+                        type="button"
+                        class="danger-button"
+                        [disabled]="deletingId() === address.id"
+                        (click)="confirmDeleteAddress(address.id)"
+                      >
+                        {{ deletingId() === address.id ? 'Deleting…' : 'Yes, delete' }}
+                      </button>
+                      <button type="button" class="link-button" (click)="cancelDeleteAddress()">Cancel</button>
+                    } @else {
+                      <button type="button" class="link-button" (click)="openEditAddress(address)">Edit</button>
+                      <button type="button" class="link-button danger" (click)="askDeleteAddress(address.id)">
+                        Delete
+                      </button>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    }
+  </main>
+</div>
