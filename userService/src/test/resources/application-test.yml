@@ -1,27 +1,25 @@
-# Tests run against a dedicated schema so they never touch the development data.
-# Flyway creates and seeds it from the same migrations the real service uses.
+# Tests run against an in-memory H2 database so the suite needs no running Postgres.
+# The H2 port of the schema lives in db/h2migration; dev/prod stay on Postgres (db/migration).
+# Everything lives in H2's default PUBLIC schema, which also lets the unqualified remember-me
+# SQL and the JdbcUserDetailsManager queries (app.security.jdbc.schema) resolve.
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/awbd?currentSchema=users_test
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-    properties:
-      hibernate:
-        default_schema: users_test
   flyway:
     enabled: true
-    schemas: users_test
-    default-schema: users_test
-    clean-disabled: false
+    locations: classpath:db/h2migration
 
 app:
   security:
     jdbc:
-      schema: users_test
+      schema: PUBLIC
     jwt:
       issuer: userService
       audience: awbd-banking-api
