@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Account } from '../models/account.model';
+import { Account, AccountLookup } from '../models/account.model';
 import { PageResponse } from '../models/page.model';
 
 export interface PageQuery {
@@ -29,5 +29,10 @@ export class AccountsService {
 
   listMine(query: PageQuery = {}): Observable<PageResponse<Account>> {
     return this.http.get<PageResponse<Account>>(`${ACCOUNTS_BASE}/me`, { params: toParams(query) });
+  }
+
+  resolveByIban(iban: string): Observable<AccountLookup> {
+    const params = new HttpParams().set('iban', iban);
+    return this.http.get<AccountLookup>(`${ACCOUNTS_BASE}/resolve`, { params });
   }
 }

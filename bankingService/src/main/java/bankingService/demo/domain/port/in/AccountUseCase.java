@@ -20,6 +20,14 @@ public interface AccountUseCase {
 
     BankAccount getAccount(UUID id);
 
+    /**
+     * Resolves an account by its IBAN so a caller can look up a transfer destination they do not
+     * own (the whole point of paying to someone else's IBAN). Deliberately not ownership-gated;
+     * the {@code AccountLookupResponse} it feeds exposes only non-sensitive fields (id, currency,
+     * status) - never balance or owner - so this cannot be used to enumerate account details.
+     */
+    BankAccount resolveByIban(String iban);
+
     Page<BankAccount> listAccounts(Pageable pageable);
 
     Page<BankAccount> listMyAccounts(Pageable pageable);

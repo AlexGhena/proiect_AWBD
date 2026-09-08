@@ -1,5 +1,6 @@
 package bankingService.demo.adapter.in.web.mapper;
 
+import bankingService.demo.adapter.in.web.dto.account.AccountLookupResponse;
 import bankingService.demo.adapter.in.web.dto.account.AccountResponse;
 import bankingService.demo.adapter.in.web.dto.account.CreateAccountRequest;
 import bankingService.demo.adapter.in.web.dto.account.UpdateAccountRequest;
@@ -37,6 +38,15 @@ public class AccountWebMapper {
                 domain.getVersion(),
                 domain.getCreatedAt(),
                 domain.getUpdatedAt()
+        );
+    }
+
+    public AccountLookupResponse toLookupResponse(BankAccount domain) {
+        return new AccountLookupResponse(
+                domain.getId(),
+                domain.getIban(),
+                domain.getCurrency(),
+                domain.getStatus()
         );
     }
 }

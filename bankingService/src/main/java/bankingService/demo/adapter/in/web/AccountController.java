@@ -1,5 +1,6 @@
 package bankingService.demo.adapter.in.web;
 
+import bankingService.demo.adapter.in.web.dto.account.AccountLookupResponse;
 import bankingService.demo.adapter.in.web.dto.account.AccountResponse;
 import bankingService.demo.adapter.in.web.dto.account.CreateAccountRequest;
 import bankingService.demo.adapter.in.web.dto.account.UpdateAccountRequest;
@@ -48,6 +49,11 @@ public class AccountController {
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(mapper.toResponse(accountUseCase.getAccount(id)));
+    }
+
+    @GetMapping("/resolve")
+    public ResponseEntity<AccountLookupResponse> resolveByIban(@RequestParam String iban) {
+        return ResponseEntity.ok(mapper.toLookupResponse(accountUseCase.resolveByIban(iban)));
     }
 
     @GetMapping

@@ -33,6 +33,11 @@ public class BankAccountPersistenceAdapter implements AccountRepositoryPort {
     }
 
     @Override
+    public Optional<BankAccount> findByIban(String iban) {
+        return repository.findByIban(iban).map(mapper::toDomain);
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         return repository.existsById(id);
     }
