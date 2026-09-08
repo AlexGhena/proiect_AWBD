@@ -80,7 +80,7 @@ flowchart TB
 
 Controllers never accept or return JPA entities — only DTOs, translated by a mapper. Domain exceptions become RFC 7807 `ProblemDetail` responses (400 validation, 404 not found, 409 conflict, 401/403 auth, 500 fallback).
 
-## Conceptual diagram — bounded contexts
+## ER — bounded contexts
 
 High-level domain view: three bounded contexts, each around its aggregate roots, connected only by logical references over REST.
 
@@ -121,7 +121,7 @@ flowchart TB
     BA -. "account IDs (REST)" .-> ST
 ```
 
-## ER diagram — 10 interconnected entities
+## Conceptual diagram — 10 interconnected entities
 
 Fields below match the JPA entities and Flyway migrations. `//` marks the schema each entity lives in.
 
