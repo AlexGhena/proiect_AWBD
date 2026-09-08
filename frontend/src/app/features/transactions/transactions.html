@@ -74,10 +74,12 @@
                 } @else {
                   <input
                     type="text"
-                    placeholder="Destination account ID"
-                    [value]="destinationExternalId()"
-                    (input)="destinationExternalId.set($any($event.target).value)"
+                    placeholder="Destination IBAN (e.g. RO49AAAA1000000000000001)"
+                    autocapitalize="characters"
+                    [value]="destinationIban()"
+                    (input)="setDestinationIban($any($event.target).value)"
                   />
+                  <span class="field-hint">Enter the recipient's IBAN — we'll verify it before you confirm.</span>
                 }
               </div>
 
@@ -124,8 +126,12 @@
             }
 
             <div class="form-buttons">
-              <button type="button" class="primary-button" (click)="reviewTransfer()">Review transfer</button>
-              <button type="button" class="secondary-button" (click)="closeForm()">Cancel</button>
+              <button type="button" class="primary-button" [disabled]="resolving()" (click)="reviewTransfer()">
+                {{ resolving() ? 'Verifying…' : 'Review transfer' }}
+              </button>
+              <button type="button" class="secondary-button" [disabled]="resolving()" (click)="closeForm()">
+                Cancel
+              </button>
             </div>
           } @else {
             <div class="confirm-summary">
@@ -137,7 +143,7 @@
                 </div>
                 <div>
                   <dt>To</dt>
-                  <dd class="mono">{{ destinationAccount()?.iban ?? destinationAccountIdResolved() }}</dd>
+                  <dd class="mono">{{ destinationDisplayIban() }}</dd>
                 </div>
                 <div>
                   <dt>Amount</dt>

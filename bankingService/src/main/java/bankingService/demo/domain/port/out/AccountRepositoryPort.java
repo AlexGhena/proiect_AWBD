@@ -13,6 +13,8 @@ public interface AccountRepositoryPort {
 
     Optional<BankAccount> findById(UUID id);
 
+    Optional<BankAccount> findByIban(String iban);
+
     boolean existsById(UUID id);
 
     boolean existsByIban(String iban);

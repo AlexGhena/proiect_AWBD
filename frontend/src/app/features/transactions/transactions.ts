@@ -2,7 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
-import { Account } from '../../core/models/account.model';
+import { Account, AccountLookup } from '../../core/models/account.model';
 import { Category } from '../../core/models/category.model';
 import { Transaction, TransferRequest } from '../../core/models/transaction.model';
 import { AccountsService } from '../../core/services/accounts.service';
@@ -42,7 +42,9 @@ export class Transactions implements OnInit {
   protected readonly sourceAccountId = signal('');
   protected readonly destinationMode = signal<DestinationMode>('own');
   protected readonly destinationAccountId = signal('');
-  protected readonly destinationExternalId = signal('');
+  protected readonly destinationIban = signal('');
+  protected readonly resolvedExternalAccount = signal<AccountLookup | null>(null);
+  protected readonly resolving = signal(false);
   protected readonly amountInput = signal('');
   protected readonly descriptionInput = signal('');
   protected readonly categoryId = signal('');
@@ -60,11 +62,16 @@ export class Transactions implements OnInit {
     () => this.accounts().find((a) => a.id === this.sourceAccountId()) ?? null,
   );
   protected readonly destinationAccountIdResolved = computed(() =>
-    this.destinationMode() === 'own' ? this.destinationAccountId() : this.destinationExternalId().trim(),
+    this.destinationMode() === 'own'
+      ? this.destinationAccountId()
+      : (this.resolvedExternalAccount()?.id ?? ''),
   );
-  protected readonly destinationAccount = computed(
-    () => this.accounts().find((a) => a.id === this.destinationAccountIdResolved()) ?? null,
-  );
+  protected readonly destinationDisplayIban = computed(() => {
+    if (this.destinationMode() === 'own') {
+      return this.accounts().find((a) => a.id === this.destinationAccountId())?.iban ?? '';
+    }
+    return this.resolvedExternalAccount()?.iban ?? this.destinationIban().trim();
+  });
   protected readonly selectedCategory = computed(
     () => this.categories().find((c) => c.id === this.categoryId()) ?? null,
   );
@@ -113,7 +120,9 @@ export class Transactions implements OnInit {
     this.sourceAccountId.set(this.activeAccounts()[0]?.id ?? '');
     this.destinationMode.set('own');
     this.destinationAccountId.set('');
-    this.destinationExternalId.set('');
+    this.destinationIban.set('');
+    this.resolvedExternalAccount.set(null);
+    this.resolving.set(false);
     this.amountInput.set('');
     this.descriptionInput.set('');
     this.categoryId.set('');
@@ -128,7 +137,14 @@ export class Transactions implements OnInit {
   protected setDestinationMode(mode: DestinationMode): void {
     this.destinationMode.set(mode);
     this.destinationAccountId.set('');
-    this.destinationExternalId.set('');
+    this.destinationIban.set('');
+    this.resolvedExternalAccount.set(null);
+    this.formError.set(null);
+  }
+
+  protected setDestinationIban(value: string): void {
+    this.destinationIban.set(value);
+    this.resolvedExternalAccount.set(null);
   }
 
   protected reviewTransfer(): void {
@@ -140,25 +156,81 @@ export class Transactions implements OnInit {
       return;
     }
 
-    const destinationId = this.destinationAccountIdResolved();
-    if (!destinationId) {
-      this.formError.set(
-        this.destinationMode() === 'own' ? 'Select a destination account.' : 'Enter a destination account ID.',
-      );
-      return;
-    }
-    if (destinationId === source.id) {
-      this.formError.set('Source and destination accounts must be different.');
-      return;
-    }
-
-    const amount = Number(this.amountInput());
-    if (!Number.isFinite(amount) || amount <= 0) {
+    if (!this.isAmountValid()) {
       this.formError.set('Enter a valid amount greater than zero.');
       return;
     }
 
-    this.step.set('confirm');
+    if (this.destinationMode() === 'own') {
+      const destinationId = this.destinationAccountId();
+      if (!destinationId) {
+        this.formError.set('Select a destination account.');
+        return;
+      }
+      if (destinationId === source.id) {
+        this.formError.set('Source and destination accounts must be different.');
+        return;
+      }
+      this.step.set('confirm');
+      return;
+    }
+
+    const iban = this.destinationIban().trim().toUpperCase();
+    if (!iban) {
+      this.formError.set('Enter the destination IBAN.');
+      return;
+    }
+
+    const alreadyResolved = this.resolvedExternalAccount();
+    if (alreadyResolved && alreadyResolved.iban === iban) {
+      if (this.validateExternalDestination(alreadyResolved, source)) {
+        this.step.set('confirm');
+      }
+      return;
+    }
+
+    this.resolving.set(true);
+    this.accountsService.resolveByIban(iban).subscribe({
+      next: (account) => {
+        this.resolving.set(false);
+        this.resolvedExternalAccount.set(account);
+        if (this.validateExternalDestination(account, source)) {
+          this.step.set('confirm');
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.resolving.set(false);
+        this.resolvedExternalAccount.set(null);
+        this.formError.set(
+          err.status === 404
+            ? 'No account was found for that IBAN. Check it and try again.'
+            : 'Could not verify that IBAN right now. Please try again.',
+        );
+      },
+    });
+  }
+
+  private isAmountValid(): boolean {
+    const amount = Number(this.amountInput());
+    return Number.isFinite(amount) && amount > 0;
+  }
+
+  private validateExternalDestination(destination: AccountLookup, source: Account): boolean {
+    if (destination.id === source.id) {
+      this.formError.set('That IBAN is your source account — choose a different destination.');
+      return false;
+    }
+    if (destination.status !== 'ACTIVE') {
+      this.formError.set('The destination account is not active and cannot receive transfers.');
+      return false;
+    }
+    if (destination.currency !== source.currency) {
+      this.formError.set(
+        `The destination account is in ${destination.currency}, but this transfer is in ${source.currency}. Currencies must match.`,
+      );
+      return false;
+    }
+    return true;
   }
 
   protected backToForm(): void {

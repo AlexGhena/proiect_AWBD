@@ -134,6 +134,14 @@ public class AccountService implements AccountUseCase, AccountTransferUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    public BankAccount resolveByIban(String iban) {
+        String normalized = iban == null ? "" : iban.trim().toUpperCase();
+        return accountRepositoryPort.findByIban(normalized)
+                .orElseThrow(() -> new ResourceNotFoundException("No account found for IBAN " + normalized));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<BankAccount> listAccounts(Pageable pageable) {
         log.debug("Listing bank accounts with pageable={}", pageable);
